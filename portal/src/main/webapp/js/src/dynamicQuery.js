@@ -622,12 +622,14 @@ function toggleGeneSets(profileClicked) {
     	$('#select_gene_sets').show();
     	$('#toggle_geneset_dialog').show();
     	$('#geneset_list').show();
+    	$('#gene_sets_area_error').show();
     }
     // if checkbox is unselected, hide button and textbox
     else {
     	$('#select_gene_sets').hide();
     	$('#toggle_geneset_dialog').hide();
     	$('#geneset_list').hide();
+    	$('#gene_sets_area_error').hide();
     	$('#geneset_list').val("");
     }
 }  

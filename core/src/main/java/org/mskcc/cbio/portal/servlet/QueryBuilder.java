@@ -82,6 +82,7 @@ public class QueryBuilder extends HttpServlet {
     public static final String STEP2_ERROR_MSG = "step2_error_msg";
     public static final String STEP3_ERROR_MSG = "step3_error_msg";
     public static final String STEP4_ERROR_MSG = "step4_error_msg";
+    public static final String STEP4_GENE_SETS_ERROR_MSG = "step4_gene_sets_error_msg";
     public static final String PROFILE_DATA_SUMMARY = "profile_data_summary";
     public static final String DOWNLOAD_LINKS = "download_links";
     public static final String OUTPUT = "output";
@@ -94,6 +95,7 @@ public class QueryBuilder extends HttpServlet {
     public static final String Z_SCORE_THRESHOLD = "Z_SCORE_THRESHOLD";
     public static final String RPPA_SCORE_THRESHOLD = "RPPA_SCORE_THRESHOLD";
     public static final String MRNA_PROFILES_SELECTED = "MRNA_PROFILES_SELECTED";
+    public static final String GSVA_PROFILE_SELECTED = "genetic_profile_ids_PROFILE_GSVA_SCORES";
     public static final String COMPUTE_LOG_ODDS_RATIO = "COMPUTE_LOG_ODDS_RATIO";
     public static final int MUTATION_DETAIL_LIMIT = 100;
     public static final String MUTATION_DETAIL_LIMIT_REACHED = "MUTATION_DETAIL_LIMIT_REACHED";
@@ -562,7 +564,7 @@ public class QueryBuilder extends HttpServlet {
                         genesetListArray.size() == 1 &&
                         genesetListArray.get(0).equals("")
                         ) {
-                    httpServletRequest.setAttribute(STEP4_ERROR_MSG, "Please make a selection to query.");
+                    httpServletRequest.setAttribute(STEP4_ERROR_MSG, "Please select some genes.");
                     errorsExist = true;
                 }
 
@@ -586,9 +588,9 @@ public class QueryBuilder extends HttpServlet {
                     // Check number of invalid genesets and write error message
                     if (invalidGenesets.size() > 0) {
                         if (invalidGenesets.size() == 1) {
-                            httpServletRequest.setAttribute(STEP4_ERROR_MSG, "Gene set not found in database: " + invalidGenesets.get(0));
+                            httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "Gene set not found in database: " + invalidGenesets.get(0));
                         } else {
-                            httpServletRequest.setAttribute(STEP4_ERROR_MSG, "Gene sets not found in database: " + String.join(", ", invalidGenesets));
+                            httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "Gene sets not found in database: " + String.join(", ", invalidGenesets));
                         }
                         errorsExist = true;
                     }
@@ -616,6 +618,17 @@ public class QueryBuilder extends HttpServlet {
                                 "Please select an mRNA profile.");
                         errorsExist = true;
                     }
+                }
+                
+                // If we have selected the GSVA profile, check that the gene set textbox is not empty,
+                // otherwise rise an error.
+                String GSVAProfileSelected = httpServletRequest.getParameter(
+                        QueryBuilder.GSVA_PROFILE_SELECTED);
+                String geneSetList = ((XssRequestWrapper)httpServletRequest).getRawParameter(GENESET_LIST);
+                if (GSVAProfileSelected != null && geneSetList == "") {
+                    httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG,
+                            "Please select some gene sets.");
+                    errorsExist = true;
                 }
             }
         } 

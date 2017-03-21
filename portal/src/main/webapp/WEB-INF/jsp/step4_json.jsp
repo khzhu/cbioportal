@@ -33,6 +33,7 @@
 <%@ page import="org.mskcc.cbio.portal.servlet.QueryBuilder" %>
 <%
     String step4ErrorMsg = (String) request.getAttribute(QueryBuilder.STEP4_ERROR_MSG);
+	String step4genesetErrorMsg = (String) request.getAttribute(QueryBuilder.STEP4_GENE_SETS_ERROR_MSG);
 %>
 
 <div class="query_step_section">
@@ -51,11 +52,16 @@
         <% out.println("<span style='font-size:120%; color:black'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href='onco_query_lang_desc.jsp' onclick='return popitup(\"onco_query_lang_desc.jsp\")'>Advanced: Onco Query Language (OQL)</a></span>"); %>
     <% } %>
     
-    <%
-	// Output step 4 form validation error
+	<!-- Output step 4 form validation error for genes -->
+	<div id=genes_area_error
+	<%
 	if (step4ErrorMsg != null) {
-	    out.println("<div class='ui-state-error ui-corner-all' style='margin-top:4px; padding:5px;'>"
-	            + "<span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span>"
+	    out.println("class='ui-state-error ui-corner-all' style='margin-top:4px; padding:5px;'");
+	}
+	%>>
+	<%
+	if (step4ErrorMsg != null) {
+	out.println("<span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span>"
 	            + "<strong>" + step4ErrorMsg + "</strong>");
 	    customCaseListStyle = "block";
 	}
@@ -108,7 +114,7 @@
     };
     </script>
         
-    <div style="padding-bottom:5px;margin-left:-3px;">
+    <div style="padding-bottom:5px;margin-left:-3px;font-size: 12px;">
         <button id="toggle_mutsig_dialog" onclick="promptMutsigTable(); return false;" style="font-size: 1em;">Select from Recurrently Mutated Genes (MutSig)</button>
         <button id="toggle_gistic_dialog" onclick="Gistic.UI.open_dialog(); return false;" style="font-size: 1em; display: none;">Select Genes from Recurrent CNAs (Gistic)</button>
     </div>
@@ -130,13 +136,29 @@ name='<%= QueryBuilder.GENE_LIST %>' title='Enter Gene Symbols or Gene Aliases' 
 	    geneListWithSemis = geneListWithSemis.replaceAll("\\\\n", "\n").replaceAll("\\\\/", "/");
         out.print(geneListWithSemis);
     }
-%></textarea>
+%></textarea></div>
 
 <p id="genestatus"></p>
 	
 	<!-- // Gene set button that opens hierarchy popup -->	
 	<span class="step_header" id="select_gene_sets">Select Gene Sets:</span>
-	<div style="padding-bottom:5px;margin-left:-3px;">
+
+	<!-- Output step 4 form validation error for gene sets -->
+	<div id=gene_sets_area_error
+	<%
+	if (step4genesetErrorMsg != null) {
+	    out.println("class='ui-state-error ui-corner-all' style='margin-top:4px; padding:5px;'");
+	}
+	%>>
+	<%
+	if (step4genesetErrorMsg != null) {
+	out.println("<span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span>"
+	            + "<strong>" + step4genesetErrorMsg + "</strong>");
+	    customCaseListStyle = "block";
+	}
+	%>
+
+	<div style="padding-bottom:5px;margin-left:-3px;font-size: 12px;">
 	       <button type="button" id="toggle_geneset_dialog" onclick="popupGenesetHierarchy(); return false;" style="font-size: 1em; ">Gene Sets</button>
 	</div>
 	
@@ -203,13 +225,7 @@ name='<%= QueryBuilder.GENE_LIST %>' title='Enter Gene Symbols or Gene Aliases' 
 	        out.print(geneSetListWithSemis);
 	    }
 	%></textarea>
-	<%
-	if (step4ErrorMsg != null) {
-	    out.println("</div>");
-	}
-	%>
-
-</div>
+</div></div>
 
 <script type='text/javascript'>
 $('#toggle_gistic_dialog').button();
