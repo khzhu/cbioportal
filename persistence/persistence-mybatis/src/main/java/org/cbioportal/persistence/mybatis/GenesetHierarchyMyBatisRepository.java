@@ -29,6 +29,4 @@ public class GenesetHierarchyMyBatisRepository implements GenesetHierarchyReposi
 
 		return genesetHierarchyMapper.getGenesetHierarchySuperNodes(genesetIds);
 	}
-	
-
 }

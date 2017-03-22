@@ -135,7 +135,7 @@ public class SampleListServiceImplTest extends BaseServiceImplTest {
     public void getAllSampleIdsInSampleList() throws Exception {
 
         List<String> expectedSampleIds = new ArrayList<>();
-        expectedSampleIds.add(SAMPLE_ID);
+        expectedSampleIds.add(SAMPLE_ID1);
         Mockito.when(sampleListRepository.getAllSampleIdsInSampleList(SAMPLE_LIST_ID)).thenReturn(expectedSampleIds);
         List<String> result = sampleListService.getAllSampleIdsInSampleList(SAMPLE_LIST_ID);
 

@@ -317,10 +317,16 @@ public class GenesetHierarchyServiceImpl implements GenesetHierarchyService {
 			ImmutablePair<Double,Double> representativeNegativeScoreAndPvalue = new ImmutablePair<Double,Double>(0.0, 1.0);
 			if (positiveScoresAndPvalues.size() > 0) {
 				int idxPositiveScores = (int)Math.round(percentile * positiveScoresAndPvalues.size() / 100.0);
+				if (idxPositiveScores == 0) {  //(can happen when positiveScoresAndPvalues.size() is small)
+				    idxPositiveScores = 1;
+				}
 				representativePositiveScoreAndPvalue = positiveScoresAndPvalues.get(idxPositiveScores-1);
 			}
 			if (negativeScoresAndPvalues.size() > 0) {
 				int idxNegativeScores = (int)Math.round(percentile * negativeScoresAndPvalues.size() / 100.0);
+				if (idxNegativeScores == 0) {  //(can happen when positiveScoresAndPvalues.size() is small)
+				    idxNegativeScores = 1;
+                }
 				representativeNegativeScoreAndPvalue = negativeScoresAndPvalues.get(idxNegativeScores-1);
 			}
 			

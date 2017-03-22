@@ -35,7 +35,7 @@ public class MrnaPercentileServiceImplTest extends BaseServiceImplTest {
         GeneGeneticData geneticData1 = new GeneGeneticData();
         geneticData1.setGeneticProfileId(GENETIC_PROFILE_ID);
         geneticData1.setEntrezGeneId(ENTREZ_GENE_ID);
-        geneticData1.setSampleId(SAMPLE_ID);
+        geneticData1.setSampleId(SAMPLE_ID1);
         geneticData1.setValue("0.3456");
         geneticDataList.add(geneticData1);
         GeneGeneticData geneticData2 = new GeneGeneticData();
@@ -53,7 +53,7 @@ public class MrnaPercentileServiceImplTest extends BaseServiceImplTest {
         GeneGeneticData geneticData4 = new GeneGeneticData();
         geneticData4.setGeneticProfileId(GENETIC_PROFILE_ID);
         geneticData4.setEntrezGeneId(2);
-        geneticData4.setSampleId(SAMPLE_ID);
+        geneticData4.setSampleId(SAMPLE_ID1);
         geneticData4.setValue("NA");
         geneticDataList.add(geneticData4);
         GeneGeneticData geneticData5 = new GeneGeneticData();

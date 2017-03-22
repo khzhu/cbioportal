@@ -8,7 +8,7 @@ public class GenesetHierarchyInfo implements Serializable {
 	private Integer nodeId;
     private String nodeName;
     private Integer parentId;
-	private String parentNode;
+	private String parentNodeName;
 	private List<Geneset> genesets;
 	
 	public Integer getNodeId() {
@@ -35,12 +35,12 @@ public class GenesetHierarchyInfo implements Serializable {
 		this.nodeName = nodeName;
 	}
 	
-	public String getParentNode() {
-		return parentNode;
+	public String getParentNodeName() {
+		return parentNodeName;
 	}
 	
-	public void setParentNode(String parentNode) {
-		this.parentNode = parentNode;
+	public void setParentNodeName(String parentNodeName) {
+		this.parentNodeName = parentNodeName;
 	}
 	
 	public List<Geneset> getGenesets() {

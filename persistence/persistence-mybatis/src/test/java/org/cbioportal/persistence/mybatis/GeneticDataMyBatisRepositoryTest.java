@@ -1,6 +1,7 @@
 package org.cbioportal.persistence.mybatis;
 
 import org.cbioportal.model.GeneGeneticAlteration;
+import org.cbioportal.model.GenesetGeneticAlteration;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,4 +52,32 @@ public class GeneticDataMyBatisRepositoryTest {
                 "-0.8665","-0.4754","-0.7221"};
         Assert.assertArrayEquals(expected2, geneticAlteration2.getSplitValues());
     }
+
+    @Test
+    public void getGenesetGeneticAlterations() {
+
+        String genesetId1 = "HINATA_NFKB_MATRIX";
+        String genesetId2 = "MORF_ATRX";
+        List<String> genesetIds = new ArrayList<>();
+        genesetIds.add(genesetId1);
+        genesetIds.add(genesetId2);
+
+        List<GenesetGeneticAlteration> result = geneticDataMyBatisRepository.getGenesetGeneticAlterations("study_tcga_pub_gsva_scores",
+                genesetIds, "SUMMARY");
+
+        //expect 2 items, one for each geneset:
+        Assert.assertEquals(2, result.size());
+        GenesetGeneticAlteration geneticAlteration1 = result.get(0);
+        Assert.assertEquals(genesetId1, geneticAlteration1.getGenesetId());
+        String[] expected = {"1.0106","-0.0662","-0.8585","-1.6576","-0.3552","-0.8306","0.8102","0.1106","0.3098","0.0309","0.0927",
+                "-0.8665","-0.0750","-0.7221"};
+        Assert.assertArrayEquals(expected, geneticAlteration1.getSplitValues());
+        GenesetGeneticAlteration geneticAlteration2 = result.get(1);
+        Assert.assertEquals(genesetId2, geneticAlteration2.getGenesetId());
+        String[] expected2 = {"-0.0670","-0.6270","-1.2266","-1.2079","-1.2262","0.6962","-0.3338","-0.1260","0.7559","-1.1267","-0.5893",
+                "-1.1506","-1.0027","-1.3157"};
+        Assert.assertArrayEquals(expected2, geneticAlteration2.getSplitValues());
+    }
+
+
 }

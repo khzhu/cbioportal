@@ -118,7 +118,7 @@ public class GenesetCorrelationServiceImpl implements GenesetCorrelationService 
 					Arrays.asList(entrezGeneId), "SUMMARY");
 			double correlationValue = calculateCorrelation(sampleIds, geneData, genesetValues);
 			// filter out the ones below correlationThreshold
-			if (Math.abs(correlationValue) < correlationThreshold) {
+			if (correlationValue < correlationThreshold) {
 				continue;
 			}
 			GenesetCorrelation genesetCorrelationItem = new GenesetCorrelation();
@@ -219,7 +219,7 @@ public class GenesetCorrelationServiceImpl implements GenesetCorrelationService 
 		double[] genesetValuesFiltered = genesetValueList.stream().mapToDouble(d -> d).toArray();
 		double correlationValue = 0;
 		// arrays need to be at least 2 long to calculate correlation: 
-		if (geneValuesFiltered.length > 2) {
+		if (geneValuesFiltered.length >= 2) {
 			// calculate spearman correlation
 			SpearmansCorrelation spearmansCorrelation = new SpearmansCorrelation();
 			correlationValue = spearmansCorrelation.correlation(geneValuesFiltered, genesetValuesFiltered);

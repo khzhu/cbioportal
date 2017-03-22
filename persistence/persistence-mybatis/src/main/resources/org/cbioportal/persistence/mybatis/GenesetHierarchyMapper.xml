@@ -8,7 +8,7 @@
         a.NODE_ID AS nodeId,
         a.NODE_NAME AS nodeName,
         a.PARENT_ID AS parentId,
-        b.NODE_NAME AS parentNode
+        b.NODE_NAME AS parentNodeName
     </sql>
 
     <select id="getGenesetHierarchyParents" resultType="org.cbioportal.model.GenesetHierarchyInfo">

@@ -46,9 +46,9 @@ public class GeneticDataServiceImplTest extends BaseServiceImplTest {
         List<Sample> sampleList = new ArrayList<>();
         Sample sample = new Sample();
         sample.setInternalId(1);
-        sample.setStableId(SAMPLE_ID);
+        sample.setStableId(SAMPLE_ID1);
         sampleList.add(sample);
-        Mockito.when(sampleService.fetchSamples(Arrays.asList(STUDY_ID), Arrays.asList(SAMPLE_ID), "ID"))
+        Mockito.when(sampleService.fetchSamples(Arrays.asList(STUDY_ID), Arrays.asList(SAMPLE_ID1), "ID"))
             .thenReturn(sampleList);
 
         List<GeneGeneticAlteration> geneticAlterationList = new ArrayList<>();
@@ -62,14 +62,14 @@ public class GeneticDataServiceImplTest extends BaseServiceImplTest {
         Mockito.when(geneticDataRepository.getGeneGeneticAlterations(GENETIC_PROFILE_ID, entrezGeneIds, PROJECTION))
             .thenReturn(geneticAlterationList);
 
-        List<GeneGeneticData> result = geneticDataService.getGeneticData(GENETIC_PROFILE_ID, SAMPLE_ID, entrezGeneIds, 
+        List<GeneGeneticData> result = geneticDataService.getGeneticData(GENETIC_PROFILE_ID, SAMPLE_ID1, entrezGeneIds, 
             PROJECTION);
 
         Assert.assertEquals(1, result.size());
         GeneGeneticData geneticData = result.get(0);
         Assert.assertEquals(ENTREZ_GENE_ID, geneticData.getEntrezGeneId());
         Assert.assertEquals(GENETIC_PROFILE_ID, geneticData.getGeneticProfileId());
-        Assert.assertEquals(SAMPLE_ID, geneticData.getSampleId());
+        Assert.assertEquals(SAMPLE_ID1, geneticData.getSampleId());
         Assert.assertEquals("0.4674", geneticData.getValue());
     }
 
@@ -97,7 +97,7 @@ public class GeneticDataServiceImplTest extends BaseServiceImplTest {
         List<Sample> samples = new ArrayList<>();
         Sample sample1 = new Sample();
         sample1.setInternalId(1);
-        sample1.setStableId(SAMPLE_ID);
+        sample1.setStableId(SAMPLE_ID1);
         samples.add(sample1);
         Sample sample2 = new Sample();
         sample2.setInternalId(2);
@@ -112,7 +112,7 @@ public class GeneticDataServiceImplTest extends BaseServiceImplTest {
         GeneGeneticData geneticData1 = result.get(0);
         Assert.assertEquals(ENTREZ_GENE_ID, geneticData1.getEntrezGeneId());
         Assert.assertEquals(GENETIC_PROFILE_ID, geneticData1.getGeneticProfileId());
-        Assert.assertEquals(SAMPLE_ID, geneticData1.getSampleId());
+        Assert.assertEquals(SAMPLE_ID1, geneticData1.getSampleId());
         Assert.assertEquals("0.4674", geneticData1.getValue());
         GeneGeneticData geneticData2 = result.get(1);
         Assert.assertEquals(ENTREZ_GENE_ID, geneticData2.getEntrezGeneId());

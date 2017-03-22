@@ -14,7 +14,7 @@ public interface GenesetRepository {
 
     Geneset getGeneset(String genesetId);
     
-    List<Geneset> fetchGenesets(List<String> genesetIds, String projection);
+    List<Geneset> fetchGenesets(List<String> genesetIds);
     
     List<Gene> getGenesByGenesetId(String genesetId);
 }

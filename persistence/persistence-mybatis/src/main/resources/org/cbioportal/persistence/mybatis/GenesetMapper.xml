@@ -54,6 +54,7 @@
         <foreach item="item" collection="genesetIds" open="(" separator="," close=")">
             #{item}
         </foreach>
+        ORDER BY geneset.EXTERNAL_ID ASC
     </select>
 
     <select id="getGenesByGenesetId" resultType="org.cbioportal.model.Gene">

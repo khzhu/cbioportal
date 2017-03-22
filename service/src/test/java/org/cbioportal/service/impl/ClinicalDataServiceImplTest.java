@@ -30,11 +30,11 @@ public class ClinicalDataServiceImplTest extends BaseServiceImplTest {
         ClinicalData sampleClinicalData = new ClinicalData();
         expectedSampleClinicalDataList.add(sampleClinicalData);
 
-        Mockito.when(clinicalDataRepository.getAllClinicalDataOfSampleInStudy(STUDY_ID, SAMPLE_ID, ATTRIBUTE_ID,
+        Mockito.when(clinicalDataRepository.getAllClinicalDataOfSampleInStudy(STUDY_ID, SAMPLE_ID1, ATTRIBUTE_ID,
                 PROJECTION, PAGE_SIZE, PAGE_NUMBER, SORT, DIRECTION))
                 .thenReturn(expectedSampleClinicalDataList);
 
-        List<ClinicalData> result = clinicalDataService.getAllClinicalDataOfSampleInStudy(STUDY_ID, SAMPLE_ID,
+        List<ClinicalData> result = clinicalDataService.getAllClinicalDataOfSampleInStudy(STUDY_ID, SAMPLE_ID1,
                 ATTRIBUTE_ID, PROJECTION, PAGE_SIZE, PAGE_NUMBER, SORT, DIRECTION);
 
         Assert.assertEquals(expectedSampleClinicalDataList, result);
@@ -45,10 +45,10 @@ public class ClinicalDataServiceImplTest extends BaseServiceImplTest {
 
         BaseMeta expectedBaseMeta = new BaseMeta();
 
-        Mockito.when(clinicalDataRepository.getMetaSampleClinicalData(STUDY_ID, SAMPLE_ID, ATTRIBUTE_ID))
+        Mockito.when(clinicalDataRepository.getMetaSampleClinicalData(STUDY_ID, SAMPLE_ID1, ATTRIBUTE_ID))
                 .thenReturn(expectedBaseMeta);
 
-        BaseMeta result = clinicalDataService.getMetaSampleClinicalData(STUDY_ID, SAMPLE_ID, ATTRIBUTE_ID);
+        BaseMeta result = clinicalDataService.getMetaSampleClinicalData(STUDY_ID, SAMPLE_ID1, ATTRIBUTE_ID);
 
         Assert.assertEquals(expectedBaseMeta, result);
     }
