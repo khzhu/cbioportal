@@ -570,29 +570,34 @@ public class QueryBuilder extends HttpServlet {
 
                 // Validate if gene sets are valid
                 if (!genesetListArray.get(0).equals("")) {
-                    // Retrieve all valid exteral IDs from the database
-                    ArrayList<String> geneSetAllExternalIds = DaoGeneset.getAllGenesetExternalIds();
-
-                    // Create array list to store invalid gene sets
-                    ArrayList<String> invalidGenesets = new ArrayList<String>();
-
-                    // Loop over gene sets in query 
-                    for (int i = 0; i < genesetListArray.size(); i++) {
-                        String geneset = genesetListArray.get(i);
-                        // Add to list when genesets not in database
-                        if (!geneSetAllExternalIds.contains(geneset)) {
-                            invalidGenesets.add(geneset);
-                        }
-                    }
-
-                    // Check number of invalid genesets and write error message
-                    if (invalidGenesets.size() > 0) {
-                        if (invalidGenesets.size() == 1) {
-                            httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "Gene set not found in database: " + invalidGenesets.get(0));
-                        } else {
-                            httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "Gene sets not found in database: " + String.join(", ", invalidGenesets));
-                        }
+                    if (genesetListArray.size() > 300) {
+                        httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "You have entered more than 300 gene sets.");
                         errorsExist = true;
+                    } else {
+                        // Retrieve all valid exteral IDs from the database
+                        ArrayList<String> geneSetAllExternalIds = DaoGeneset.getAllGenesetExternalIds();
+
+                        // Create array list to store invalid gene sets
+                        ArrayList<String> invalidGenesets = new ArrayList<String>();
+
+                        // Loop over gene sets in query 
+                        for (int i = 0; i < genesetListArray.size(); i++) {
+                            String geneset = genesetListArray.get(i);
+                            // Add to list when genesets not in database
+                            if (!geneSetAllExternalIds.contains(geneset)) {
+                                invalidGenesets.add(geneset);
+                            }
+                        }
+
+                        // Check number of invalid genesets and write error message
+                        if (invalidGenesets.size() > 0) {
+                            if (invalidGenesets.size() == 1) {
+                                httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "Gene set not found in database: " + invalidGenesets.get(0));
+                            } else {
+                                httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "Gene sets not found in database: " + String.join(", ", invalidGenesets));
+                            }
+                            errorsExist = true;
+                        }
                     }
                 }
 

@@ -319,6 +319,16 @@ var submitHandler = (function() {
 	var sample_mapping_completed = false;
 	return function() {
 		if (sample_mapping_completed) {
+		        // Count the length of the URL parameters
+		        // IE11 only allows for URLs smaller than 2,048 characters
+		        // Assumption: 1,000 characters left for genes and gene sets. If the length
+		        // is higher, then do a POST instead of a GET
+		        urlLength = $("#gene_list").val().length + $("#geneset_list").val().length;
+		        if (urlLength > 1000) {
+		            $("#main_form").attr("method","post");
+		        } else {
+		            $("#main_form").attr("method","get");
+		        }
 			$('#main_form').submit();
 			sample_mapping_completed = false;
 		} else {
