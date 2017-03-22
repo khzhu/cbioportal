@@ -102,7 +102,7 @@ var initializeGenesetJstree = function (percentile, scoreThreshold, pvalueThresh
 	pvalueThreshold = pvalueThreshold || "0.05";
 
 	// Construct URL
-	var hierarchyJSON = "api/genesets/hierarchy/fetch?geneticProfileId=" + gsvaGenomicProfileId;
+	var hierarchyJSON = "api/geneset-hierarchy/fetch?geneticProfileId=" + gsvaGenomicProfileId;
 	
 	if (percentile != "") {
 		hierarchyJSON = hierarchyJSON + "&percentile=" + percentile;
