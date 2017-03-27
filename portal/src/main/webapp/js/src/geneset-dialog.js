@@ -178,7 +178,7 @@ var hierarchyServiceCallback = function(result_data) {
 		// Read the node
 		nodeId = data[i].nodeName;
 		nodeName = data[i].nodeName;
-		nodeParent = data[i].parentNode;
+		nodeParent = data[i].parentNodeName;
 		
 		// Convert node information to a flat format suitable for jstree
 		if (nodeParent == null) {
