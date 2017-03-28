@@ -40,7 +40,7 @@ var plotsData = (function() {
 
     var ajaxCall = function(axis, callback_func) {
         if ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene ||
-        		$("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene_set) {
+        		$("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.geneset) {
             
             function inner_profile_callback_func(profileData) { 
                 var _tmp = {}; //convert to json format
@@ -297,10 +297,10 @@ var plotsData = (function() {
         } else if (gsva_vs_genetic()) {
             //translate: assign text value a numeric value for clinical data
             var _axis, _axis_key;
-            if ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set) {
+            if ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset) {
                 _axis = "x";
                 _axis_key = "xVal";
-            } else if ($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene_set) {
+            } else if ($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.geneset) {
                 _axis = "y";
                 _axis_key = "yVal";
             }

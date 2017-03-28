@@ -5,7 +5,7 @@ var sidebar = (function() {
     	clinicalData = false;
     	geneProfileData = false;
     	onlyMutData = false;
-    	geneSetsData = false;
+    	sData = false;
     	
     	//check clinical data
     	if (metaData.getClinAttrsMeta().length !== 0) {
@@ -24,14 +24,14 @@ var sidebar = (function() {
     		}
     	}
     		
-		// check geneSet data
+		// check geneset data
     	if (window.QuerySession.getQueryGenesets() !== null &&
-    			metaData.getGeneSetsMeta(window.QuerySession.getQueryGenesets()[0]).length !== 0) {
-    		geneSetsData = true;
+    			metaData.getGenesetsMeta(window.QuerySession.getQueryGenesets()[0]).length !== 0) {
+    		genesetsData = true;
     	}
     	
         //the study only has profile data
-        if (!clinicalData && geneProfileData && !geneSetsData) { 
+        if (!clinicalData && geneProfileData && !genesetsData) { 
             if (onlyMutData) {
                 $("#plots").empty();
                 $("#plots").append("No data available for generating plots.");               
@@ -48,9 +48,9 @@ var sidebar = (function() {
                 }
             }
         // only have gsva data
-        } else if ((!geneProfileData || onlyMutData) && !clinicalData && geneSetsData) {
-        	$("input:radio[name='" + ids.sidebar.x.data_type + "'][value='" + vals.data_type.gene_set + "']").attr('checked', 'checked');
-            $("input:radio[name='" + ids.sidebar.y.data_type + "'][value='" + vals.data_type.gene_set + "']").attr('checked', 'checked');
+        } else if ((!geneProfileData || onlyMutData) && !clinicalData && genesetsData) {
+        	$("input:radio[name='" + ids.sidebar.x.data_type + "'][value='" + vals.data_type.geneset + "']").attr('checked', 'checked');
+            $("input:radio[name='" + ids.sidebar.y.data_type + "'][value='" + vals.data_type.geneset + "']").attr('checked', 'checked');
             $("#" + ids.sidebar.x.data_type).hide(); //if there's no clinical data and profile data, remove data type choices
             $("#" + ids.sidebar.y.data_type).hide();
             genesetsSpec.init("x");
@@ -63,7 +63,7 @@ var sidebar = (function() {
             }
                 
         //only have clinical data
-        } else if ((!geneProfileData || onlyMutData) && clinicalData && !geneSetsData) { 
+        } else if ((!geneProfileData || onlyMutData) && clinicalData && !genesetsData) { 
             $("#" + ids.sidebar.x.data_type).hide(); //Hide all buttons
             $("#" + ids.sidebar.y.data_type).hide(); 
             $("input:radio[name='" + ids.sidebar.x.data_type + "'][value='" + vals.data_type.clin + "']").attr('checked', 'checked');
@@ -73,7 +73,7 @@ var sidebar = (function() {
             optSpec.init();
             
         //only clinical and profile data
-        } else if ((!geneSetsData) && clinicalData && geneProfileData) {
+        } else if ((!genesetsData) && clinicalData && geneProfileData) {
         	$("#button-x-gene-set").hide(); //Hide gene set button
         	$("#button-y-gene-set").hide();
             profileSpec.init("x");
@@ -93,9 +93,9 @@ var sidebar = (function() {
                 profileSpec.updateProfileNameList("x");
             }
         // only clinical and gsva data
-        } else if ((!geneProfileData || onlyMutData) && clinicalData && geneSetsData) {
-            $("input:radio[name='" + ids.sidebar.x.data_type + "'][value='" + vals.data_type.gene_set + "']").attr('checked', 'checked');
-            $("input:radio[name='" + ids.sidebar.y.data_type + "'][value='" + vals.data_type.gene_set + "']").attr('checked', 'checked');
+        } else if ((!geneProfileData || onlyMutData) && clinicalData && genesetsData) {
+            $("input:radio[name='" + ids.sidebar.x.data_type + "'][value='" + vals.data_type.geneset + "']").attr('checked', 'checked');
+            $("input:radio[name='" + ids.sidebar.y.data_type + "'][value='" + vals.data_type.geneset + "']").attr('checked', 'checked');
         	$("#button-x-gene").hide(); //Hide gene button
         	$("#button-y-gene").hide();
         	genesetsSpec.init("x");
@@ -103,7 +103,7 @@ var sidebar = (function() {
             optSpec.init();
             //reset the default value of x: default is always x copy num, y mrna
             var _type_arr = [];
-            $.each(metaData.getGeneSetsMeta($("#" + ids.sidebar.x.gene).val()), function(index, obj) {
+            $.each(metaData.getGenesetsMeta($("#" + ids.sidebar.x.gene).val()), function(index, obj) {
                 _type_arr.push(obj.type);
             });
 
@@ -112,7 +112,7 @@ var sidebar = (function() {
                 genesetsSpec.updatePlotValueList("x");
             }
         //only profile and gsva data
-        } else if (geneProfileData && !onlyMutData && !clinicalData && geneSetsData) {
+        } else if (geneProfileData && !onlyMutData && !clinicalData && genesetsData) {
             $("#button-x-clinical").hide(); //Hide clinical data button
         	$("#button-y-clinical").hide();
             profileSpec.init("x");
@@ -124,7 +124,7 @@ var sidebar = (function() {
                 profileSpec.updateProfileNameList("x");                    
             }
         //no plots data at all
-        } else if ((!geneProfileData || onlyMutData) && !clinicalData && !geneSetsData) { 
+        } else if ((!geneProfileData || onlyMutData) && !clinicalData && !genesetsData) { 
             $("#plots").empty();
             $("#plots").append("No data available for generating plots.");
         //normal plots
@@ -146,7 +146,7 @@ var sidebar = (function() {
         $("#" + ids.sidebar.x.data_type).change(function() {
             if ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene) {
                 profileSpec.init("x");
-            } else if ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set) {
+            } else if ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset) {
                 genesetsSpec.init("x");
             } else if ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.clin) {
                 clinSpec.init("x");
@@ -157,7 +157,7 @@ var sidebar = (function() {
         $("#" + ids.sidebar.y.data_type).change(function() {
             if ($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene) {
                 profileSpec.init("y");
-            } else if ($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene_set) {
+            } else if ($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.geneset) {
                 genesetsSpec.init("y");
             } else if ($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.clin) {
                 clinSpec.init("y");
@@ -181,7 +181,7 @@ var sidebar = (function() {
                 _x_opts.profile_type_index = document.getElementById(ids.sidebar.x.profile_type).selectedIndex;
                 _x_opts.profile_name_index = document.getElementById(ids.sidebar.x.profile_name).selectedIndex;
                 _x_opts.apply_log_scale = $("#" + ids.sidebar.x.log_scale).prop('checked');
-            } else if (_x_opts.data_type === vals.data_type.gene_set) {
+            } else if (_x_opts.data_type === vals.data_type.geneset) {
                 _x_opts.data_type = $("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val();
                 _x_opts.gene_index = document.getElementById(ids.sidebar.x.gene).selectedIndex;
                 _y_opts.profile_name_index = document.getElementById(ids.sidebar.x.profile_name).selectedIndex;
@@ -196,7 +196,7 @@ var sidebar = (function() {
                 _y_opts.profile_name_index = document.getElementById(ids.sidebar.y.profile_name).selectedIndex;
                 _y_opts.apply_log_scale = $("#" + ids.sidebar.y.log_scale).prop('checked');              
                 _y_opts.lock_gene = $("#" + ids.sidebar.y.lock_gene).prop('checked');
-            } else if (_y_opts.data_type === vals.data_type.gene_set) {
+            } else if (_y_opts.data_type === vals.data_type.geneset) {
                 _y_opts.gene_index = document.getElementById(ids.sidebar.y.gene).selectedIndex;
                 _y_opts.profile_name_index = document.getElementById(ids.sidebar.y.profile_name).selectedIndex;
             } else if (_y_opts.data_type === vals.data_type.clin) {
@@ -212,8 +212,8 @@ var sidebar = (function() {
                 profileSpec.updateProfileNameList("x");
                 document.getElementById(ids.sidebar.x.profile_name).selectedIndex = _y_opts.profile_name_index;
                 $("#" + ids.sidebar.x.log_scale).attr('checked', _y_opts.apply_log_scale);
-            } else if (_y_opts.data_type === vals.data_type.gene_set) {
-                $("input:radio[name='" + ids.sidebar.x.data_type + "'][value='" + vals.data_type.gene_set + "']").attr('checked', 'checked');
+            } else if (_y_opts.data_type === vals.data_type.geneset) {
+                $("input:radio[name='" + ids.sidebar.x.data_type + "'][value='" + vals.data_type.geneset + "']").attr('checked', 'checked');
                 genesetsSpec.init("x");
                 document.getElementById(ids.sidebar.x.gene).selectedIndex = _y_opts.gene_index;
                 genesetsSpec.updatePlotValueList("x");
@@ -236,8 +236,8 @@ var sidebar = (function() {
                 $("#" + ids.sidebar.y.log_scale).attr('checked', _x_opts.apply_log_scale);
                 $("#" + ids.sidebar.y.lock_gene).attr('checked', _y_opts.lock_gene);
                 document.getElementById(ids.sidebar.y.gene).disabled = $("#" + ids.sidebar.y.lock_gene).attr('checked');
-            } else if (_x_opts.data_type === vals.data_type.gene_set) {
-                $("input:radio[name='" + ids.sidebar.y.data_type + "'][value='" + vals.data_type.gene_set + "']").attr('checked', 'checked');
+            } else if (_x_opts.data_type === vals.data_type.geneset) {
+                $("input:radio[name='" + ids.sidebar.y.data_type + "'][value='" + vals.data_type.geneset + "']").attr('checked', 'checked');
                 genesetsSpec.init("y");
                 document.getElementById(ids.sidebar.y.gene).selectedIndex = _x_opts.gene_index;
                 genesetsSpec.updatePlotValueList("y");

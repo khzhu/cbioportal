@@ -33,7 +33,7 @@
 <%@ page import="org.mskcc.cbio.portal.servlet.QueryBuilder" %>
 <%
     String step4ErrorMsg = (String) request.getAttribute(QueryBuilder.STEP4_ERROR_MSG);
-	String step4genesetErrorMsg = (String) request.getAttribute(QueryBuilder.STEP4_GENE_SETS_ERROR_MSG);
+	String step4genesetErrorMsg = (String) request.getAttribute(QueryBuilder.STEP4_GENESETS_ERROR_MSG);
 %>
 
 <div class="query_step_section">

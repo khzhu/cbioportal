@@ -53,7 +53,7 @@ var d3_class = {
 var vals = {
     data_type : {
         gene: "gene",
-        gene_set: "gene_set",
+        geneset: "geneset",
         clin: "clinical_attribute"
     },
     profile_type : {

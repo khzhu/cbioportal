@@ -124,7 +124,7 @@ var scatterPlots = (function() {
             if (clinical_attr_is_discretized(axis)) {
                 discretized_axis(clinical_data_interpreter.get_text_labels(axis), true);
             } else continuous_axis(true);
-        } else if ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene_set) {
+        } else if ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.geneset) {
             continuous_axis(true);
         } else {
             continuous_axis(false);
@@ -689,8 +689,8 @@ var scatterPlots = (function() {
             }
             
         } else if (gsva_vs_clinical()) {
-            var _profile_axis = ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set)? "x": "y";
-            var _clin_axis = ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set)? "y": "x";
+            var _profile_axis = ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset)? "x": "y";
+            var _clin_axis = ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset)? "y": "x";
             initAxis(_clin_axis);
             drawAxis(_clin_axis);
             re_draw_axis(_profile_axis);
@@ -701,8 +701,8 @@ var scatterPlots = (function() {
     }
     
     function appendTitle(axis) { //axis titles
-        var elt = (($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene_set))? document.getElementById(ids.sidebar[axis].profile_name):document.getElementById(ids.sidebar[axis].clin_attr);
-        var _name = (($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene_set))? ($("#" + ids.sidebar[axis].gene).val() + ", " + elt.options[elt.selectedIndex].text): elt.options[elt.selectedIndex].text;
+        var elt = (($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.geneset))? document.getElementById(ids.sidebar[axis].profile_name):document.getElementById(ids.sidebar[axis].clin_attr);
+        var _name = (($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.geneset))? ($("#" + ids.sidebar[axis].gene).val() + ", " + elt.options[elt.selectedIndex].text): elt.options[elt.selectedIndex].text;
         var _id = elt.options[elt.selectedIndex].value;
         
         //trimm exceedingly long titles
@@ -759,8 +759,8 @@ var scatterPlots = (function() {
         var _description = "";
         if ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene) {
             _description = metaData.getProfileDescription($("#" + ids.sidebar[axis].gene).val(), _id);
-        } else if ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene_set) {
-        	_description = metaData.getGeneSetsDescription($("#" + ids.sidebar[axis].gene).val(), _id);
+        } else if ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.geneset) {
+        	_description = metaData.getGenesetsDescription($("#" + ids.sidebar[axis].gene).val(), _id);
         } else {
             _description = metaData.getClinicalAttrDescription(_id);
         }
@@ -875,7 +875,7 @@ var scatterPlots = (function() {
                     _content += "<br>Horizontal: <b>" + d.xVal + "</b><br>" + "Vertical: <b>" + gisticInterpreter.convert_to_val(d.yVal) + "</b>";
                 }
             } else if (gsva_vs_genetic()) {
-                if ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set) {
+                if ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset) {
                 	if (is_profile_discretized("y")) {
                 		_content += "<br>Horizontal: <b>" + d.xVal + "</b><br>" + "Vertical: <b>" + gisticInterpreter.convert_to_val(d.yVal) + "</b>";
                 	} else {
@@ -967,10 +967,10 @@ var scatterPlots = (function() {
     
     function get_tab_delimited_data() {
         var result_str = "";
-        var elt_x = (($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set))? document.getElementById(ids.sidebar.x.profile_name):document.getElementById(ids.sidebar.x.clin_attr);
-        var elt_y = (($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set))? document.getElementById(ids.sidebar.y.profile_name):document.getElementById(ids.sidebar.y.clin_attr);
-        var _title_x = (($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set))? ($("#" + ids.sidebar.x.gene).val() + ", " + elt_x.options[elt_x.selectedIndex].text): elt_x.options[elt_x.selectedIndex].text;
-        var _title_y = (($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set))? ($("#" + ids.sidebar.y.gene).val() + ", " + elt_y.options[elt_y.selectedIndex].text): elt_y.options[elt_y.selectedIndex].text;            
+        var elt_x = (($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset))? document.getElementById(ids.sidebar.x.profile_name):document.getElementById(ids.sidebar.x.clin_attr);
+        var elt_y = (($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset))? document.getElementById(ids.sidebar.y.profile_name):document.getElementById(ids.sidebar.y.clin_attr);
+        var _title_x = (($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset))? ($("#" + ids.sidebar.x.gene).val() + ", " + elt_x.options[elt_x.selectedIndex].text): elt_x.options[elt_x.selectedIndex].text;
+        var _title_y = (($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene) || ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset))? ($("#" + ids.sidebar.y.gene).val() + ", " + elt_y.options[elt_y.selectedIndex].text): elt_y.options[elt_y.selectedIndex].text;            
         //titles
         if (clinical_vs_clinical()) {
             result_str += "Sample Id" + "\t" + _title_x + "\t" + _title_y + "\n";

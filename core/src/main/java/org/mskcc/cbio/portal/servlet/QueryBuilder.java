@@ -82,7 +82,7 @@ public class QueryBuilder extends HttpServlet {
     public static final String STEP2_ERROR_MSG = "step2_error_msg";
     public static final String STEP3_ERROR_MSG = "step3_error_msg";
     public static final String STEP4_ERROR_MSG = "step4_error_msg";
-    public static final String STEP4_GENE_SETS_ERROR_MSG = "step4_gene_sets_error_msg";
+    public static final String STEP4_GENESETS_ERROR_MSG = "step4_genesets_error_msg";
     public static final String PROFILE_DATA_SUMMARY = "profile_data_summary";
     public static final String DOWNLOAD_LINKS = "download_links";
     public static final String OUTPUT = "output";
@@ -571,7 +571,7 @@ public class QueryBuilder extends HttpServlet {
                 // Validate if gene sets are valid
                 if (!genesetListArray.get(0).equals("")) {
                     if (genesetListArray.size() > 300) {
-                        httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "You have entered more than 300 gene sets.");
+                        httpServletRequest.setAttribute(STEP4_GENESETS_ERROR_MSG, "You have entered more than 300 gene sets.");
                         errorsExist = true;
                     } else {
                         // Retrieve all valid exteral IDs from the database
@@ -592,9 +592,9 @@ public class QueryBuilder extends HttpServlet {
                         // Check number of invalid genesets and write error message
                         if (invalidGenesets.size() > 0) {
                             if (invalidGenesets.size() == 1) {
-                                httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "Gene set not found in database: " + invalidGenesets.get(0));
+                                httpServletRequest.setAttribute(STEP4_GENESETS_ERROR_MSG, "Gene set not found in database: " + invalidGenesets.get(0));
                             } else {
-                                httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG, "Gene sets not found in database: " + String.join(", ", invalidGenesets));
+                                httpServletRequest.setAttribute(STEP4_GENESETS_ERROR_MSG, "Gene sets not found in database: " + String.join(", ", invalidGenesets));
                             }
                             errorsExist = true;
                         }
@@ -631,7 +631,7 @@ public class QueryBuilder extends HttpServlet {
                         QueryBuilder.GSVA_PROFILE_SELECTED);
                 String geneSetList = ((XssRequestWrapper)httpServletRequest).getRawParameter(GENESET_LIST);
                 if (GSVAProfileSelected != null && geneSetList == "") {
-                    httpServletRequest.setAttribute(STEP4_GENE_SETS_ERROR_MSG,
+                    httpServletRequest.setAttribute(STEP4_GENESETS_ERROR_MSG,
                             "Please select some gene sets.");
                     errorsExist = true;
                 }

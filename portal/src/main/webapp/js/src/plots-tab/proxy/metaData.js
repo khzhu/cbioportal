@@ -187,7 +187,7 @@ var metaData = (function() {
         getGeneticProfilesMeta: function(_gene) {
             return geneticProfiles[_gene];
         },
-        getGeneSetsMeta: function(_gene) {
+        getGenesetsMeta: function(_gene) {
             return genesetProfiles[_gene];
         },
         getProfileDescription: function(_gene, attr_id) {
@@ -198,8 +198,8 @@ var metaData = (function() {
             });
             return _result;
         },
-        getGeneSetsDescription: function(_gene, attr_id) {
-            $.each(metaData.getGeneSetsMeta(_gene), function(index, obj) {
+        getGenesetsDescription: function(_gene, attr_id) {
+            $.each(metaData.getGenesetsMeta(_gene), function(index, obj) {
                 if (obj.id === attr_id) {
                     _result = obj.description;
                 }

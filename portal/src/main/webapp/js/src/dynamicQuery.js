@@ -296,7 +296,7 @@ function reviewCurrentSelections(){
     toggleThresholdPanel($("." + PROFILE_PROTEIN_EXPRESSION+"[type=checkbox]"), PROFILE_PROTEIN_EXPRESSION, "#rppa_score_threshold");
     
     // This function makes sure that when incorrect gene set is queried, the box is present on error page
-    toggleGeneSets($("." + PROFILE_GSVA_SCORES+"[type=checkbox]"));
+    toggleGenesets($("." + PROFILE_GSVA_SCORES+"[type=checkbox]"));
 
     // determine whether optional arguments section should be shown or hidden
  //   if ($("#optional_args > input").length >= 1){
@@ -622,7 +622,7 @@ function updateCaseListSmart() {
 }
 
 // if GSVA profile is available and checked, display the geneset button and gene sets textbox
-function toggleGeneSets(profileClicked) {
+function toggleGenesets(profileClicked) {
 	
     if (profileClicked.prop('checked')){
     	
@@ -733,7 +733,7 @@ function updateCancerStudyInformation() {
     
     //  Set up an Event Handler for showing/hiding gene sets button and textbox
     $("." + PROFILE_GSVA_SCORES).click(function(){
-       toggleGeneSets($(this));
+       toggleGenesets($(this));
     });
 
     //  Set up an Event Handler for showing/hiding RPPA threshold input

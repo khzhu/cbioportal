@@ -88,9 +88,9 @@ var PlotUtilsModel = Backbone.Model.extend({
 		
 		var gsva_vs_clinical = function() {
 			if ((($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.clin || 
-			    	$("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set) &&
+			    	$("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset) &&
 			    	($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.clin ||
-			    	$("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene_set))) {
+			    	$("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.geneset))) {
 				var _type_x = $("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val();
 			    var _type_y = $("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val();
 			    if (_type_x !== _type_y) {
@@ -101,9 +101,9 @@ var PlotUtilsModel = Backbone.Model.extend({
 		
 		var gsva_vs_genetic = function() {
 			if ((($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene || 
-			    	$("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set) &&
+			    	$("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset) &&
 			    	($("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene ||
-			    	$("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.gene_set))) {
+			    	$("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() === vals.data_type.geneset))) {
 				var _type_x = $("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val();
 			    var _type_y = $("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val();
 			    if (_type_x !== _type_y) {
@@ -114,7 +114,7 @@ var PlotUtilsModel = Backbone.Model.extend({
 
 		var gsva_vs_gsva = function() {
 		    if ($("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === $("input:radio[name='" + ids.sidebar.y.data_type + "']:checked").val() && 
-		        $("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.gene_set) {
+		        $("input:radio[name='" + ids.sidebar.x.data_type + "']:checked").val() === vals.data_type.geneset) {
 		        return true;
 		    } return false;
 		};
@@ -442,7 +442,7 @@ var is_discretized = function(axis) {
     } else if ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene) {
         if (is_profile_discretized(axis)) return true;
         return false;
-    } else if ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.gene_set) {
+    } else if ($("input:radio[name='" + ids.sidebar[axis].data_type + "']:checked").val() === vals.data_type.geneset) {
     	return false;
     }
 };

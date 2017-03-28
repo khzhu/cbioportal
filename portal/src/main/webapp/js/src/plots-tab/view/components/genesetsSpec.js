@@ -24,7 +24,7 @@
 
 var genesetsSpec = (function() {
 
-    function appendGeneSetsList(axis) {
+    function appendGenesetsList(axis) {
         var $gene_div = $("<div class='form-inline' style='margin-top: 10px;'></div>");
         $("#" + ids.sidebar[axis].spec_div).append($gene_div);
         var $select_div = $("<div class='form-group'></div>");
@@ -60,7 +60,7 @@ var genesetsSpec = (function() {
         append();
 
         function append() {
-            $.each(metaData.getGeneSetsMeta($("#" + ids.sidebar[axis].gene).val()), function(index, obj) {
+            $.each(metaData.getGenesetsMeta($("#" + ids.sidebar[axis].gene).val()), function(index, obj) {
                 $("#" + ids.sidebar[axis].profile_name).append("<option value='" + obj.id + "'>" + obj.name + "</option>");
             });
         };
@@ -75,7 +75,7 @@ var genesetsSpec = (function() {
         append();
 
         function append() {
-            $.each(metaData.getGeneSetsMeta($("#" + ids.sidebar[axis].gene).val()), function(index, obj) {
+            $.each(metaData.getGenesetsMeta($("#" + ids.sidebar[axis].gene).val()), function(index, obj) {
                 $("#" + ids.sidebar[axis].profile_name).append(
                           "<option value='" + obj.id + "'>" + obj.name + "</option>");
                 
@@ -90,7 +90,7 @@ var genesetsSpec = (function() {
     return {
         init: function(axis) {
             $("#" + ids.sidebar[axis].spec_div).empty();
-            appendGeneSetsList(axis);
+            appendGenesetsList(axis);
             appendPlotValueList(axis);
         },
         updatePlotValueList: updatePlotValueList

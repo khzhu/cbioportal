@@ -60,30 +60,30 @@ var CoexpPlots = function() {
             entity2_profile: profile2Id
         };
         //Check if the comparison contains gene sets
-        entityXIsGeneSet = false;
-        entityYIsGeneSet = false;
+        entityXIsGeneset = false;
+        entityYIsGeneset = false;
         if (profile1Id.indexOf("mrna") == -1) {
-        	entityXIsGeneSet = true;
+        	entityXIsGeneset = true;
         }
         if (profile2Id.indexOf("mrna") == -1) {
-        	entityYIsGeneSet = true;
+        	entityYIsGeneset = true;
         }
         $.post(
             "getAlterationData.json", 
             paramsGetAlterationData, 
-            getAlterationDataCallBack(divName, entityX, entityY, pearson, spearman, entityXIsGeneSet, entityYIsGeneSet), 
+            getAlterationDataCallBack(divName, entityX, entityY, pearson, spearman, entityXIsGeneset, entityYIsGeneset), 
             "json");
     }
 
-    function getAlterationDataCallBack(_divName, _entityX, _entityY, _pearson, _spearman, entityXIsGeneSet, entityYIsGeneSet) {
+    function getAlterationDataCallBack(_divName, _entityX, _entityY, _pearson, _spearman, entityXIsGeneset, entityYIsGeneset) {
         return function(result) {
             var alteration_data_result = jQuery.extend(result, {}, true);
             //get mutation data only for the genes (and not for the gene sets)
             if (CoExpView.has_mutation_data()) {
             	var proxy = DataProxyFactory.getDefaultMutationDataProxy();
                 var _genes = null;
-            	if (entityXIsGeneSet) {
-            		if (entityYIsGeneSet) { //Both are GeneSets: do a pseudo callback as if there were no mutations
+            	if (entityXIsGeneset) {
+            		if (entityYIsGeneset) { //Both are Genesets: do a pseudo callback as if there were no mutations
             			pseudo_callback(
                                 alteration_data_result, 
                                 _divName, 
@@ -107,7 +107,7 @@ var CoexpPlots = function() {
                             );
             		}
             	} else {
-            		if (entityYIsGeneSet) { //EntityX is Gene and EntityY is Gene Set
+            		if (entityYIsGeneset) { //EntityX is Gene and EntityY is Gene Set
             			_genes = _entityX;
             			proxy.getMutationData(
                         		_genes, 
