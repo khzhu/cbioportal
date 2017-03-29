@@ -179,7 +179,7 @@ name='<%= QueryBuilder.GENE_LIST %>' title='Enter Gene Symbols or Gene Aliases' 
 	    		<td style="padding-right:15px;">
 		    		<!-- GSVA score threshold box -->
  					<label for="gsva_score_threshold_box">GSVA score</label>
-				<input type="text" id="gsva_score_threshold_box" class="form-control" placeholder="0.1" title="GSVA score threshold" onchange="" size="4" style="height:20px">
+				<input type="text" id="gsva_score_threshold_box" class="form-control" placeholder="0.5" title="GSVA score threshold" onchange="" size="4" style="height:20px">
 			</td>
   	    		<td style="padding-right:15px;">
 		    		<!-- GSVA p-value threshold box -->

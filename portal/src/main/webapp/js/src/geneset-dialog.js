@@ -81,7 +81,7 @@ var initGenesetDialogue = function() {
     	
     	// Defaults: 
     	pvalueThreshold = (pvalueThreshold == '' ? "0.05" : pvalueThreshold);
-    	scoreThreshold = (scoreThreshold == '' ? "0.1" : scoreThreshold);
+    	scoreThreshold = (scoreThreshold == '' ? "0.5" : scoreThreshold);
     	
     	console.log("Filtering hierarchy data for: p-value < " + pvalueThreshold + ", score > " + scoreThreshold + ", percentile = " + percentile);
     	
@@ -98,7 +98,7 @@ var initializeGenesetJstree = function (percentile, scoreThreshold, pvalueThresh
 	console.log("Initializing hierarchical tree for gene set popup");
 	//defaults:
 	percentile = percentile || "75";
-	scoreThreshold = scoreThreshold || "0.1";
+	scoreThreshold = scoreThreshold || "0.5";
 	pvalueThreshold = pvalueThreshold || "0.05";
 
 	// Construct URL
@@ -176,19 +176,19 @@ var hierarchyServiceCallback = function(result_data) {
 
 	for (var i = 0; i < data.length; i++ ) {		
 		// Read the node
-		nodeId = data[i].nodeName;
-		nodeName = data[i].nodeName;
-		nodeParent = data[i].parentNodeName;
+		var nodeName = data[i].nodeName;
+		var nodeParent = data[i].parentNodeName;
 		
 		// Convert node information to a flat format suitable for jstree
 		if (nodeParent == null) {
 			nodeParent = "#";
 		}
 		flatData.push({
-			id : nodeId.toString(),
+			id : nodeName,
 			parent : nodeParent,
-			text : nodeName,
-			name : nodeName,
+			li_attr: {
+				name: nodeName,
+			},
 			geneset : false,
 			state : {
 				opened : true,
@@ -203,32 +203,32 @@ var hierarchyServiceCallback = function(result_data) {
 			for (var j = 0; j < data[i].genesets.length; j++ ) {
 				
 				// Convert gene set information to a flat format suitable for jstree
-				genesetId = leafId ++;
-				genesetName = data[i].genesets[j].genesetId;
-				genesetDescription = data[i].genesets[j].description;
-				genesetRepresentativeScore = data[i].genesets[j].representativeScore;
-				genesetRepresentativePvalue = data[i].genesets[j].representativePvalue;
-				genesetRefLink = data[i].genesets[j].refLink;
-				genesetNrGenes = data[i].genesets[j].nrGenes;
+				var genesetId = leafId ++;
+				var genesetName = data[i].genesets[j].genesetId;
+				var genesetDescription = data[i].genesets[j].description;
+				var genesetRepresentativeScore = data[i].genesets[j].representativeScore;
+				var genesetRepresentativePvalue = data[i].genesets[j].representativePvalue;
+				var genesetRefLink = data[i].genesets[j].refLink;
 	
-				var genePlurality;
-				var genesetNameText;
+				// Create leaf description
 				
-				// Decide if it tree description show geneset or genesets
-				if (genesetNrGenes == 1) {
-					genePlurality = 'gene';
-				} else if (genesetNrGenes > 1) {
-					genePlurality = 'genes';
-				} else {
-					genePlurality = '';
-					genesetNrGenes = '';
-				}
+				// TODO Add number of genes to leaf description
+//				var genesetNrGenes = data[i].genesets[j].nrGenes;
 				
-				// Add nr of genes to leaf
-				genesetNameText = genesetNrGenes + ' ' + genePlurality;
-				
+//				// Decide for geneset or genesets
+//				var genePlurality;
+//				if (genesetNrGenes == 1) {
+//					genePlurality = 'gene';
+//				} else {
+//					genePlurality = 'genes';
+//				}
+//
+//				// Add nr of genes to leaf
+//				var genesetInfo = genesetNrGenes + ' ' + genePlurality + ',';
+				var genesetInfo = '';
+
 				// Add score to leaf
-				genesetNameText = genesetNameText + ', score = ' +  parseFloat(genesetRepresentativeScore).toFixed(2);
+				genesetInfo = genesetInfo + 'score = ' +  parseFloat(genesetRepresentativeScore).toFixed(2);
 				
 				// Round pvalue
 				// 0.005 is rounded to 0.01 and 0.0049 to 0.00, so below 0.005 should be exponential (5e-3)
@@ -239,25 +239,29 @@ var hierarchyServiceCallback = function(result_data) {
 				}
 				
 				// Add pvalue to leaf 
-				genesetNameText = genesetNameText + ', p-value = ' +  genesetRepresentativePvalue;
+				genesetInfo = genesetInfo + ', p-value = ' +  genesetRepresentativePvalue;
 	
 				// Build label and add styling
-				genesetNameText = genesetName + '<span style="font-weight:normal;font-style:italic;"> ' + genesetNameText + '</span>';
+				var genesetNameText = genesetName + '<span style="font-weight:normal;font-style:italic;"> ' + genesetInfo + '</span>';
 				
 				flatData.push({
 					// Add compulsary characteristics
 					id : genesetId.toString(),
-					parent : nodeId,
+					parent : nodeName,
 					text: genesetNameText, 
 					state : {
 						selected : false
 					},
+					li_attr : {
+						name: genesetName,
+					},
 				
-					// Also add data which might be useful later
-					name: genesetName,
+					// Also add additional data which might be useful later
 					description : genesetDescription,
 					representativeScore : genesetRepresentativeScore,
+					representativePvalue : genesetRepresentativePvalue,
 					refLink : genesetRefLink,
+					// nrGenes : genesetNrGenes
 					geneset : true,
 					
 				});
@@ -274,8 +278,9 @@ var hierarchyServiceCallback = function(result_data) {
 		"core" : {
 			"data" : flatData,
 			"themes": {
-				"icons":false
-			} 
+				"icons" : false
+			},
+			"check_callback" : true
 		}
 			
 	// This keeps nodes open after searching for them
@@ -321,7 +326,7 @@ var updateGenesetList = function() {
 		
 		// Check if selected checkbox is not a node
 		if (selectedBoxes[i].original.geneset) {
-			var boxName = selectedBoxes[i].original.name;
+			var boxName = selectedBoxes[i].original.li_attr.name;
 			
 			// Select a geneset only once
 			if (selectedGenesets.indexOf(boxName) == -1) {
