@@ -1,10 +1,4 @@
 /*
- * Copyright (c) 2016 The Hyve B.V.
- * This code is licensed under the GNU Affero General Public License (AGPL),
- * version 3, or (at your option) any later version.
- */
-
-/*
  * This file is part of cBioPortal.
  *
  * cBioPortal is free software: you can redistribute it and/or modify
@@ -67,7 +61,7 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
     
 
     /**
-     * Defaul no_arg Constructor.
+     * Default no_arg Constructor.
      */
     public SAMLUserDetailsServiceImpl() {
     }
@@ -91,13 +85,12 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
     /**
      * Implementation of {@code SAMLUserDetailsService}. 
      * Instantiate PortalUserDetails object from  
-     * SAML assertion received from identity provider
+     * SAML assertion received from keycloak Identity Provider
      */
     @Override
     public Object loadUserBySAML(SAMLCredential credential)
     {
-        PortalUserDetails toReturn = null;
-
+        PortalUserDetails userDetailsObj = null;
         String userId = null;
         List<String> userRoles = new ArrayList<String>();
 
@@ -112,7 +105,6 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
                 log.debug(userId);
             }
             if (attrName == SAML_IDP_METADATA_ROLE_ATTR_NAME) {
-
                 List<XMLObject> attributeValues = cAttribute.getAttributeValues();
                 if (!attributeValues.isEmpty()) {
                     userRoles.add(new StringBuilder(APP_NAME).append(":").append(
@@ -134,13 +126,13 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
             log.debug("loadUserBySAML(), IDP successfully authenticated user, userid: " + userId);
 
             //add granted authorities:
-            if (userRoles.size() > 0) toReturn = new PortalUserDetails(userId,
+            if (userRoles.size() > 0) userDetailsObj = new PortalUserDetails(userId,
                 AuthorityUtils.createAuthorityList(userRoles.toArray(new String[userRoles.size()])));
-            else 
-                toReturn = new PortalUserDetails(userId, AuthorityUtils.createAuthorityList(new String[0]));
-            toReturn.setEmail(userId);
-            toReturn.setName(userId);
-            return toReturn;
+            else
+                userDetailsObj = new PortalUserDetails(userId, AuthorityUtils.createAuthorityList(new String[0]));
+            userDetailsObj.setEmail(userId);
+            userDetailsObj.setName(userId);
+            return userDetailsObj;
         }
         catch (Exception e) {
             throw new RuntimeException("Error occurs during authentication: " + e.getMessage());
