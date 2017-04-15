@@ -100,11 +100,11 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
             log.debug("loadUserBySAML(), parsing attribute -" + attrName);
 
 
-            if (userId == null && attrName == SAML_IDP_METADATA_EMAIL_ATTR_NAME) {
+            if (userId == null && attrName.equals(SAML_IDP_METADATA_EMAIL_ATTR_NAME)) {
                 userId = credential.getAttributeAsString(cAttribute.getName());
                 log.debug(userId);
             }
-            if (attrName == SAML_IDP_METADATA_ROLE_ATTR_NAME) {
+            if (attrName.equals(SAML_IDP_METADATA_ROLE_ATTR_NAME)) {
                 List<XMLObject> attributeValues = cAttribute.getAttributeValues();
                 if (!attributeValues.isEmpty()) {
                     userRoles.add(new StringBuilder(APP_NAME).append(":").append(
