@@ -1,26 +1,3 @@
-/*
- * Copyright (c) 2016 The Hyve B.V.
- * This code is licensed under the GNU Affero General Public License (AGPL),
- * version 3, or (at your option) any later version.
- */
-
-/*
- * This file is part of cBioPortal.
- *
- * cBioPortal is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 package org.cbioportal.security.spring.authentication.keycloak;
 
 import java.util.ArrayList;
@@ -107,11 +84,11 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
             log.debug("loadUserBySAML(), parsing attribute -" + attrName);
 
 
-            if (userId == null && attrName == SAML_IDP_METADATA_EMAIL_ATTR_NAME) {
+            if (userId == null && attrName.equals(SAML_IDP_METADATA_EMAIL_ATTR_NAME)) {
                 userId = credential.getAttributeAsString(cAttribute.getName());
                 log.debug(userId);
             }
-            if (attrName == SAML_IDP_METADATA_ROLE_ATTR_NAME) {
+            if (attrName.equals(SAML_IDP_METADATA_ROLE_ATTR_NAME)) {
 
                 List<XMLObject> attributeValues = cAttribute.getAttributeValues();
                 if (!attributeValues.isEmpty()) {
