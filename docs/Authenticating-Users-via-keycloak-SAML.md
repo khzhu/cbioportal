@@ -34,8 +34,8 @@ Please Note if you are logged in the master realm, this drop down menu lists all
 3. To create a SAML client, go to the Clients left menu item. On this page you’ll see a Create button on the right. This will bring you to the Add Client page.
 Enter in the Client ID of the client e.g 'cbioportal'. 
 ![](images/previews/add-client.png)
-Enter 'http://localhost:8080/auth/realms/demo/protocol/saml' in the **Root URL** textbox, then click on Save button. This will take you to the client page.
-Please note this is often a URL and will be the expected issuer value in SAML requests sent by the application. 
+Enter 'http://localhost:8080/auth/realms/demo/protocol/saml' in the **Root URL** textbox (Please note this is often a URL and will be the expected issuer value in SAML requests sent by the application), then click on Save button. This will take you to the client page.
+
 
 4. Select **saml** in the Client Protocol drop down box and use **email** for your Name ID. 
 5. Next, enter a redirect URL for keycloak to use upon a successful authentication e.g http://localhost:8081/cbioportal/*, and leave everything else as it is. 
@@ -51,7 +51,7 @@ Make sure you add at least **X500 email** User Property attribute and **roles** 
 
 ## Export SAML Keys
 Click on **SML Keys** tab next to **Setting**, and click on **export** button, this will bring your "Export SAML Key Cbioportal" page.
- Accept everything and type a password in the Store Password textbox and click on the **Download** button. 
+ Accept everything and type a password e.g. apollo1 in the Store Password textbox and click on the **Download** button. 
 When you are done, move the jks file to portal/src/main/resources/.
 ![](images/previews/export-SAML-keys.png)
 Please note you can also use the java 'keytool' to generate keystore and then import to the keycloak to customize your keystore attributes.
