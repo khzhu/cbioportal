@@ -1,3 +1,23 @@
+<<<<<<< HEAD
+=======
+/*
+ * This file is part of cBioPortal.
+ *
+ * cBioPortal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+>>>>>>> 38b780fcb0f1fcc8a48fe2664b8f991ebad8312a
 package org.cbioportal.security.spring.authentication.keycloak;
 
 import java.util.ArrayList;
@@ -44,7 +64,7 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
     
 
     /**
-     * Defaul no_arg Constructor.
+     * Default no_arg Constructor.
      */
     public SAMLUserDetailsServiceImpl() {
     }
@@ -68,13 +88,12 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
     /**
      * Implementation of {@code SAMLUserDetailsService}. 
      * Instantiate PortalUserDetails object from  
-     * SAML assertion received from identity provider
+     * SAML assertion received from keycloak Identity Provider
      */
     @Override
     public Object loadUserBySAML(SAMLCredential credential)
     {
-        PortalUserDetails toReturn = null;
-
+        PortalUserDetails userDetailsObj = null;
         String userId = null;
         List<String> userRoles = new ArrayList<String>();
 
@@ -89,7 +108,10 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
                 log.debug(userId);
             }
             if (attrName.equals(SAML_IDP_METADATA_ROLE_ATTR_NAME)) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 38b780fcb0f1fcc8a48fe2664b8f991ebad8312a
                 List<XMLObject> attributeValues = cAttribute.getAttributeValues();
                 if (!attributeValues.isEmpty()) {
                     userRoles.add(new StringBuilder(APP_NAME).append(":").append(
@@ -111,13 +133,13 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
             log.debug("loadUserBySAML(), IDP successfully authenticated user, userid: " + userId);
 
             //add granted authorities:
-            if (userRoles.size() > 0) toReturn = new PortalUserDetails(userId,
+            if (userRoles.size() > 0) userDetailsObj = new PortalUserDetails(userId,
                 AuthorityUtils.createAuthorityList(userRoles.toArray(new String[userRoles.size()])));
-            else 
-                toReturn = new PortalUserDetails(userId, AuthorityUtils.createAuthorityList(new String[0]));
-            toReturn.setEmail(userId);
-            toReturn.setName(userId);
-            return toReturn;
+            else
+                userDetailsObj = new PortalUserDetails(userId, AuthorityUtils.createAuthorityList(new String[0]));
+            userDetailsObj.setEmail(userId);
+            userDetailsObj.setName(userId);
+            return userDetailsObj;
         }
         catch (Exception e) {
             throw new RuntimeException("Error occurs during authentication: " + e.getMessage());
