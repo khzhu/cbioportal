@@ -4,11 +4,7 @@
   <parent>
     <artifactId>master</artifactId>
     <groupId>org.mskcc.cbio</groupId>
-<<<<<<< HEAD
     <version>1.6.0-SNAPSHOT</version>
-=======
-    <version>1.5.1</version>
->>>>>>> 38b780fcb0f1fcc8a48fe2664b8f991ebad8312a
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>core</artifactId>
