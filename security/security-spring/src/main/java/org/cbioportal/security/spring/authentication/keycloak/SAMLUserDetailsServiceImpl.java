@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /*
  * This file is part of cBioPortal.
  *
@@ -17,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
->>>>>>> 38b780fcb0f1fcc8a48fe2664b8f991ebad8312a
 package org.cbioportal.security.spring.authentication.keycloak;
 
 import java.util.ArrayList;
@@ -108,10 +105,6 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService
                 log.debug(userId);
             }
             if (attrName.equals(SAML_IDP_METADATA_ROLE_ATTR_NAME)) {
-<<<<<<< HEAD
-
-=======
->>>>>>> 38b780fcb0f1fcc8a48fe2664b8f991ebad8312a
                 List<XMLObject> attributeValues = cAttribute.getAttributeValues();
                 if (!attributeValues.isEmpty()) {
                     userRoles.add(new StringBuilder(APP_NAME).append(":").append(
