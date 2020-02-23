@@ -8,7 +8,15 @@
      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
-     
+
+    <!-- Mock beans for EhCache manager and statistics -->
+     <bean id="cacheManager" class="org.mockito.Mockito" factory-method="mock">
+         <constructor-arg value="javax.cache.CacheManager" />
+     </bean>
+     <bean id="ehCacheStatistics" class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="org.cbioportal.persistence.util.EhCacheStatistics" />
+    </bean>
+
     <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 	    <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 	    <property name="searchSystemEnvironment" value="true" />
@@ -16,6 +24,7 @@
 	    <property name="locations">
 		     <list>
 			     <value>file:///#{systemEnvironment['PORTAL_HOME']}/src/main/resources/portal.properties</value>
+                 <value>file:///#{systemEnvironment['PORTAL_HOME']}/src/main/resources/maven.properties</value>
 		     </list>
 	    </property>
      </bean>
@@ -44,14 +53,14 @@
 	</bean>
 	
 	<!-- Values are for testing only, so need to correspond to the cgds in the pom.xml -->
-	<bean id="dbcpDataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
+	<bean id="dbcpDataSource" destroy-method="close" class="org.apache.commons.dbcp2.BasicDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="url" value="jdbc:mysql://localhost:3306/cgds_test" />
-		<property name="username" value="${db.user}" />
-		<property name="password" value="${db.password}" />
+		<property name="username" value="${db.test.username}" />
+		<property name="password" value="${db.test.password}" />
 		<property name="minIdle" value="0" />
 		<property name="maxIdle" value="10" />
-		<property name="maxActive" value="100" />
+		<property name="maxTotal" value="100" />
 		<property name="poolPreparedStatements" value="true" />
 	</bean>
 	
@@ -59,6 +68,7 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="businessDataSource" />
         <property name="typeAliasesPackage" value="org.mskcc.cbio.portal.model" />
+        <property name="typeHandlersPackage" value="org.cbioportal.persistence.mybatis.typehandler" /><!-- this can prob. be multiple , separated items like other package config below -->
     </bean>
     
     <!-- scan for mappers and let them be autowired -->
@@ -68,12 +78,12 @@
 
     <!-- these are required to get properly autowired mappers into our service classes -->
     <!-- when creating services via manually loading this context file -->
-    <bean id="genePanelMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
-        <property name="mapperInterface" value="org.mskcc.cbio.portal.persistence.GenePanelMapper" />
+    <bean id="genePanelMapperLegacy" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="org.mskcc.cbio.portal.persistence.GenePanelMapperLegacy" />
         <property name="sqlSessionFactory" ref="sqlSessionFactory" />
     </bean>
-    <bean id="genePanelRepository" class="org.mskcc.cbio.portal.repository.GenePanelMyBatisRepository">
-        <property name="genePanelMapper" ref="genePanelMapper" />
+    <bean id="genePanelRepositoryLegacy" class="org.mskcc.cbio.portal.repository.GenePanelMyBatisRepositoryLegacy">
+        <property name="genePanelMapper" ref="genePanelMapperLegacy" />
     </bean>
 
     <bean id="cnSegmentMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
@@ -82,6 +92,14 @@
     </bean>
     <bean id="cnSegmentRepository" class="org.mskcc.cbio.portal.repository.CNSegmentMyBatisRepository">
         <property name="cnSegmentMapper" ref="cnSegmentMapper" />
+    </bean>
+
+    <bean id="mutationalSignatureMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="org.mskcc.cbio.portal.persistence.MutationalSignatureMapper" />
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+    <bean id="mutationalSignatureRepository" class="org.mskcc.cbio.portal.repository.MutationalSignatureMyBatisRepository">
+        <property name="mutationalSignatureMapper" ref="mutationalSignatureMapper" />
     </bean>
 
     <!-- enable component scanning (beware that this does not enable mapper scanning!) -->

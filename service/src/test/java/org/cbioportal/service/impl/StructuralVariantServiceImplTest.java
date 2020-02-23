@@ -1,16 +1,7 @@
 /*
- * Copyright (c) 2016 Memorial Sloan-Kettering Cancer Center.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
- * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
- * is on an "as is" basis, and Memorial Sloan-Kettering Cancer Center has no
- * obligations to provide maintenance, support, updates, enhancements or
- * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
- * liable to any party for direct, indirect, special, incidental or
- * consequential damages, including lost profits, arising out of the use of this
- * software and its documentation, even if Memorial Sloan-Kettering Cancer
- * Center has been advised of the possibility of such damage.
+ * Copyright (c) 2018 The Hyve B.V.
+ * This code is licensed under the GNU Affero General Public License (AGPL),
+ * version 3, or (at your option) any later version.
  */
 
 /*
@@ -28,15 +19,13 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package org.cbioportal.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import junit.framework.Assert;
 import org.cbioportal.model.StructuralVariant;
 import org.cbioportal.persistence.StructuralVariantRepository;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,13 +33,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-/**
- *
- * @author jake
- */
+import java.util.ArrayList;
+import java.util.List;
+
 @RunWith(MockitoJUnitRunner.class)
-public class StructuralVariantServiceImplTest {
-    
+public class StructuralVariantServiceImplTest extends BaseServiceImplTest {
+
     @InjectMocks
     private StructuralVariantServiceImpl structuralVariantService;
     
@@ -58,23 +46,24 @@ public class StructuralVariantServiceImplTest {
     private StructuralVariantRepository structuralVariantRepository;
     
     @Test
-    public void getStructuralVariant() throws Exception{
-        ArrayList<String> testGeneticProfileStableIds = new ArrayList<>();
-        testGeneticProfileStableIds.add("test-study");
-        ArrayList<String> testHugoGeneSymbols = new ArrayList<>();
-        testHugoGeneSymbols.add("test_hugo_gene_symbol");
-        ArrayList<String> testSampleStableIds = new ArrayList<>();
-        testSampleStableIds.add("test_sample_stable_id");
-        String testSampleList = "test_sample_list";
-        
+    public void getStructuralVariants() throws Exception {
+
         List<StructuralVariant> expectedStructuralVariantList = new ArrayList<>();
-        StructuralVariant expectedStructuralVariant = new StructuralVariant();
-        expectedStructuralVariantList.add(expectedStructuralVariant);
+        StructuralVariant sampleStructuralVariant = new StructuralVariant();
+        expectedStructuralVariantList.add(sampleStructuralVariant);
         
-        Mockito.when(structuralVariantRepository.getStructuralVariant(testGeneticProfileStableIds, testHugoGeneSymbols, testSampleStableIds)).thenReturn(expectedStructuralVariantList);
-        
-        List<StructuralVariant> resultStructuralVariantList = structuralVariantService.getStructuralVariant(testGeneticProfileStableIds, testHugoGeneSymbols, testSampleStableIds);
-        
-        Assert.assertEquals(expectedStructuralVariantList, resultStructuralVariantList);
+        List<String> molecularProfileIds = new ArrayList<>();
+        List<Integer> entrezGeneIds = new ArrayList<>();
+        molecularProfileIds.add("genetic_profile_id");
+        entrezGeneIds.add(ENTREZ_GENE_ID_1);
+
+        Mockito.when(structuralVariantRepository.fetchStructuralVariants(molecularProfileIds, 
+                entrezGeneIds, null))
+            .thenReturn(expectedStructuralVariantList);
+
+        List<StructuralVariant> result = structuralVariantService.fetchStructuralVariants(molecularProfileIds, 
+                entrezGeneIds, null);
+
+        Assert.assertEquals(expectedStructuralVariantList, result);
     }
 }

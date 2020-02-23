@@ -1,31 +1,64 @@
 package org.cbioportal.persistence.mybatis;
 
 import org.cbioportal.model.Mutation;
-import org.cbioportal.model.MutationCount;
-import org.cbioportal.model.MutationSampleCountByGene;
-import org.cbioportal.model.MutationSampleCountByKeyword;
-import org.cbioportal.model.meta.BaseMeta;
+import org.cbioportal.model.MutationCountByPosition;
+import org.cbioportal.model.MutationCountByGene;
 import org.cbioportal.model.meta.MutationMeta;
 
 import java.util.List;
 
 public interface MutationMapper {
 
-    List<Mutation> getMutationsBySampleListId(String geneticProfileId, String sampleListId, String projection,
+    List<Mutation> getMutationsBySampleListId(String molecularProfileId, String sampleListId, List<Integer> entrezGeneIds,
+                                              Boolean snpOnly, String projection, Integer limit, Integer offset, 
+                                              String sortBy, String direction);
+
+    MutationMeta getMetaMutationsBySampleListId(String molecularProfileId, String sampleListId, 
+                                                List<Integer> entrezGeneIds, Boolean snpOnly);
+
+    List<Mutation> getMutationsInMultipleMolecularProfiles(List<String> molecularProfileIds, List<String> sampleIds,
+                                                           List<Integer> entrezGeneIds, Boolean snpOnly,
+                                                           String projection, Integer limit, Integer offset,
+                                                           String sortBy, String direction);
+
+    MutationMeta getMetaMutationsInMultipleMolecularProfiles(List<String> molecularProfileIds, List<String> sampleIds,
+                                                             List<Integer> entrezGeneIds, Boolean snpOnly);
+
+    List<Mutation> getMutationsBySampleIds(String molecularProfileId, List<String> sampleIds, 
+                                           List<Integer> entrezGeneIds, Boolean snpOnly, String projection, 
                                            Integer limit, Integer offset, String sortBy, String direction);
 
-    MutationMeta getMetaMutationsBySampleListId(String geneticProfileId, String sampleListId);
-
-    List<Mutation> getMutationsBySampleIds(String geneticProfileId, List<String> sampleIds, String projection, 
-                                           Integer limit, Integer offset, String sortBy, String direction);
-
-    MutationMeta getMetaMutationsBySampleIds(String geneticProfileId, List<String> sampleIds);
+    MutationMeta getMetaMutationsBySampleIds(String molecularProfileId, List<String> sampleIds, 
+                                             List<Integer> entrezGeneIds, Boolean snpOnly);
     
-    List<MutationSampleCountByGene> getSampleCountByEntrezGeneIds(String geneticProfileId, List<Integer> entrezGeneIds);
-    
-    List<MutationSampleCountByKeyword> getSampleCountByKeywords(String geneticProfileId, List<String> keywords);
+    List<MutationCountByGene> getSampleCountByEntrezGeneIdsAndSampleIds(String molecularProfileId,
+                                                                        List<String> sampleIds,
+                                                                        List<Integer> entrezGeneIds,
+                                                                        Boolean snpOnly);
 
-    List<MutationCount> getMutationCountsBySampleListId(String geneticProfileId, String sampleListId);
+    List<MutationCountByGene> getSampleCountInMultipleMolecularProfiles(List<String> molecularProfileIds,
+                                                                        List<String> sampleIds,
+                                                                        List<Integer> entrezGeneIds,
+                                                                        Boolean snpOnly);
+
+    List<MutationCountByGene> getPatientCountInMultipleMolecularProfiles(List<String> molecularProfileIds,
+                                                                         List<String> patientIds,
+                                                                         List<Integer> entrezGeneIds,
+                                                                         Boolean snpOnly);
     
-    List<MutationCount> getMutationCountsBySampleIds(String geneticProfileId, List<String> sampleIds);
+    List<MutationCountByGene> getSampleCountInMultipleMolecularProfilesForFusions(List<String> molecularProfileIds,
+                                                                                           List<String> sampleIds,
+                                                                                           List<Integer> entrezGeneIds,
+                                                                                           Boolean snpOnly);
+    
+    
+
+    MutationCountByPosition getMutationCountByPosition(Integer entrezGeneId, Integer proteinPosStart, 
+                                                       Integer proteinPosEnd);
+
+    // TODO: cleanup once fusion/structural data is fixed in database
+    List<Mutation> getFusionsInMultipleMolecularProfiles(List<String> molecularProfileIds, List<String> sampleIds,
+            List<Integer> entrezGeneIds, Boolean snpOnly, String projection, Integer limit, Integer offset,
+            String sortBy, String direction);
+    // TODO: cleanup once fusion/structural data is fixed in database
 }

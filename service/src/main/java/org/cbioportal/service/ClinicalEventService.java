@@ -11,7 +11,16 @@ public interface ClinicalEventService {
     
     List<ClinicalEvent> getAllClinicalEventsOfPatientInStudy(String studyId, String patientId, String projection, 
                                                              Integer pageSize, Integer pageNumber, String sortBy, 
-                                                             String direction) throws PatientNotFoundException, StudyNotFoundException;
+                                                             String direction) 
+        throws PatientNotFoundException, StudyNotFoundException;
 
-    BaseMeta getMetaPatientClinicalEvents(String studyId, String patientId) throws PatientNotFoundException, StudyNotFoundException;
+    BaseMeta getMetaPatientClinicalEvents(String studyId, String patientId) 
+        throws PatientNotFoundException, StudyNotFoundException;
+    
+    List<ClinicalEvent> getAllClinicalEventsInStudy(String studyId, String projection, Integer pageSize,
+                                                    Integer pageNumber, String sortBy, String direction) 
+        throws StudyNotFoundException;
+    
+    BaseMeta getMetaClinicalEvents(String studyId) 
+        throws StudyNotFoundException;    
 }

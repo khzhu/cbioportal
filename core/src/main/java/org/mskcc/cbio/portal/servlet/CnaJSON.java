@@ -36,6 +36,7 @@ import org.mskcc.cbio.portal.model.*;
 import org.mskcc.cbio.portal.dao.*;
 import org.mskcc.cbio.portal.util.*;
 import org.apache.log4j.Logger;
+import org.cbioportal.model.CNA;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.*;
@@ -57,6 +58,7 @@ public class CnaJSON extends HttpServlet {
     public static final String GET_CNA_FRACTION_CMD = "get_cna_fraction";
     public static final String CNA_EVENT_ID = "cna_id";
     public static final String CBIO_GENES_FILTER = "cbio_genes_filter";//Only get cna events from Cbio Cancer genes
+    private static final double FRACTION_GENOME_ALTERED_CUTOFF = 0.2;
     
     // class which process access control to cancer studies
     private AccessControl accessControl;
@@ -132,8 +134,7 @@ public class CnaJSON extends HttpServlet {
         	            }else{
         	                internalSampleIds = InternalIdUtil.getInternalSampleIds(cancerStudy.getInternalId(), Arrays.asList(sampleIds));
         	            }
-        	            cnaEvents = DaoCnaEvent.getCnaEvents(internalSampleIds,
-        	                    (filterByCbioGene?daoGeneOptimized.getEntrezGeneIds(daoGeneOptimized.getCbioCancerGenes()):null), cnaProfile.getGeneticProfileId(), Arrays.asList((short)-2,(short)2));
+        	            cnaEvents = DaoCnaEvent.getCnaEvents(internalSampleIds, null, cnaProfile.getGeneticProfileId(), Arrays.asList((short)-2,(short)2));
         	            if (!cnaEvents.isEmpty()) {
                             String concatEventIds = getConcatEventIds(cnaEvents);
                             int profileId = cnaProfile.getGeneticProfileId();
@@ -243,8 +244,8 @@ public class CnaJSON extends HttpServlet {
 					} else {
 						sampleIds = InternalIdUtil.getInternalNonNormalSampleIds(cancerStudy.getInternalId());
 					}
-					fraction = DaoCopyNumberSegment.getCopyNumberActeredFraction(sampleIds, cancerStudy.getInternalId(),
-							GlobalProperties.getPatientViewGenomicOverviewCnaCutoff()[0]);
+                    fraction = DaoCopyNumberSegment.getCopyNumberActeredFraction(sampleIds, cancerStudy.getInternalId(), 
+                        FRACTION_GENOME_ALTERED_CUTOFF);
 				}
 			}
         } catch (DaoException ex) {
@@ -296,8 +297,8 @@ public class CnaJSON extends HttpServlet {
         
         for (CnaEvent cnaEvent : cnaEvents) {
             long gene = cnaEvent.getEntrezGeneId();
-            if (cnaEvent.getAlteration()==CnaEvent.CNA.AMP
-                    ||cnaEvent.getAlteration()==CnaEvent.CNA.GAIN) { // since drugs are usually intibiting
+            if (cnaEvent.getAlteration()==CNA.AMP
+                    ||cnaEvent.getAlteration()==CNA.GAIN) { // since drugs are usually intibiting
                 genes.add(gene);
             }
             
@@ -430,7 +431,6 @@ public class CnaJSON extends HttpServlet {
         CanonicalGene gene = daoGeneOptimized.getGene(cnaEvent.getEntrezGeneId());
         String symbol = gene.getHugoGeneSymbolAllCaps();
         data.get("gene").add(symbol);
-        data.get("cytoband").add(gene.getCytoband());
         data.get("entrez").add(cnaEvent.getEntrezGeneId());
         data.get("alter").add(cnaEvent.getAlteration().getCode());
         data.get("mrna").add(mrna);
@@ -448,15 +448,13 @@ public class CnaJSON extends HttpServlet {
         data.get("altrate").add(context);
         
         boolean isSangerGene = false;
-        boolean isCbioCancerGene = false;
         try {
             isSangerGene = DaoSangerCensus.getInstance().getCancerGeneSet().containsKey(symbol);
-            isCbioCancerGene = daoGeneOptimized.isCbioCancerGene(gene);
         } catch (DaoException ex) {
             throw new ServletException(ex);
         }
         data.get("sanger").add(isSangerGene);
-        data.get("cancer-gene").add(isCbioCancerGene);
+        data.get("cancer-gene").add(false);
         
         // drug
         data.get("drug").add(drugs);
@@ -474,15 +472,15 @@ public class CnaJSON extends HttpServlet {
         list.add(row);
     }
     
-    private static final Map<Integer,Map<String,Map<CnaEvent.CNA,List>>> gisticMap // map from cancer study id
-            = new HashMap<Integer,Map<String,Map<CnaEvent.CNA,List>>>();     // to map from gene to a list of params
+    private static final Map<Integer,Map<String,Map<CNA,List>>> gisticMap // map from cancer study id
+            = new HashMap<Integer,Map<String,Map<CNA,List>>>();     // to map from gene to a list of params
     
-    private static List getGistic(int cancerStudyId, String gene, CnaEvent.CNA cna) throws DaoException {
-        Map<String,Map<CnaEvent.CNA,List>> mapGeneGistic;
+    private static List getGistic(int cancerStudyId, String gene, CNA cna) throws DaoException {
+        Map<String,Map<CNA,List>> mapGeneGistic;
         synchronized(gisticMap) {
             mapGeneGistic = gisticMap.get(cancerStudyId);
             if (mapGeneGistic == null) {
-                mapGeneGistic = new HashMap<String,Map<CnaEvent.CNA,List>>();
+                mapGeneGistic = new HashMap<String,Map<CNA,List>>();
                 gisticMap.put(cancerStudyId, mapGeneGistic);
                 List<Gistic> gistics = DaoGistic.getAllGisticByCancerStudyId(cancerStudyId);
                 for (Gistic g : gistics) {
@@ -494,9 +492,9 @@ public class CnaJSON extends HttpServlet {
                     l.add(g.getqValue());
                     l.add(genes.size());
                     for (String hugo : genes) {
-                        Map<CnaEvent.CNA,List> mapCC = mapGeneGistic.get(hugo);
+                        Map<CNA,List> mapCC = mapGeneGistic.get(hugo);
                         if (mapCC==null) {
-                            mapCC = new EnumMap<CnaEvent.CNA,List>(CnaEvent.CNA.class);
+                            mapCC = new EnumMap<CNA,List>(CNA.class);
                             mapGeneGistic.put(hugo, mapCC);
                         }
                         mapCC.put(cna,l);
@@ -505,7 +503,7 @@ public class CnaJSON extends HttpServlet {
             }
         }
         
-        Map<CnaEvent.CNA,List> m = mapGeneGistic.get(gene);
+        Map<CNA,List> m = mapGeneGistic.get(gene);
         return m==null ? null : m.get(cna);
     }
     

@@ -29,7 +29,7 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration("/applicationContext-web.xml")
+@ContextConfiguration("/applicationContext-web-test.xml")
 @Configuration
 public class SignificantCopyNumberRegionControllerTest {
 
@@ -62,6 +62,7 @@ public class SignificantCopyNumberRegionControllerTest {
 
     @Autowired
     private SignificantCopyNumberRegionService significantCopyNumberRegionService;
+
     private MockMvc mockMvc;
 
     @Bean
@@ -75,7 +76,7 @@ public class SignificantCopyNumberRegionControllerTest {
         Mockito.reset(significantCopyNumberRegionService);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
-    
+
     @Test
     public void getSignificantCopyNumberRegions() throws Exception {
 
@@ -132,7 +133,7 @@ public class SignificantCopyNumberRegionControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/significant-copy-number-regions")
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].gisticRoiId").doesNotExist())
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))

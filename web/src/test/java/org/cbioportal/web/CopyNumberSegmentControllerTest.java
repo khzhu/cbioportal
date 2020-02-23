@@ -30,7 +30,7 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration("/applicationContext-web.xml")
+@ContextConfiguration("/applicationContext-web-test.xml")
 @Configuration
 public class CopyNumberSegmentControllerTest {
 
@@ -38,7 +38,7 @@ public class CopyNumberSegmentControllerTest {
     private static final String TEST_SAMPLE_STABLE_ID_1 = "test_sample_stable_id_1";
     private static final int TEST_CANCER_STUDY_ID_1 = 1;
     private static final String TEST_CANCER_STUDY_IDENTIFIER_1 = "test_study_1";
-    private static final Integer TEST_SEG_ID_1 = 1;
+    private static final Long TEST_SEG_ID_1 = 1L;
     private static final String TEST_CHR_1 = "test_chr_1";
     private static final Integer TEST_START_1 = 15;
     private static final Integer TEST_END_1 = 20;
@@ -48,22 +48,23 @@ public class CopyNumberSegmentControllerTest {
     private static final String TEST_SAMPLE_STABLE_ID_2 = "test_sample_stable_id_2";
     private static final int TEST_CANCER_STUDY_ID_2 = 2;
     private static final String TEST_CANCER_STUDY_IDENTIFIER_2 = "test_study_2";
-    private static final Integer TEST_SEG_ID_2 = 2;
+    private static final Long TEST_SEG_ID_2 = 2L;
     private static final String TEST_CHR_2 = "test_chr_2";
     private static final Integer TEST_START_2 = 25;
     private static final Integer TEST_END_2 = 34;
     private static final Integer TEST_NUM_PROBES_2 = 5;
     private static final BigDecimal TEST_SEGMENT_MEAN_2 = new BigDecimal(0.4);
-    
-    
+
+
     @Autowired
     private WebApplicationContext wac;
 
     @Autowired
     private CopyNumberSegmentService copyNumberSegmentService;
-    private MockMvc mockMvc;
 
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    private MockMvc mockMvc;
 
     @Bean
     public CopyNumberSegmentService copyNumberSegmentService() {
@@ -76,20 +77,20 @@ public class CopyNumberSegmentControllerTest {
         Mockito.reset(copyNumberSegmentService);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
-    
+
     @Test
     public void getCopyNumberSegmentsInSampleInStudyDefaultProjection() throws Exception {
 
         List<CopyNumberSeg> copyNumberSegList = createExampleCopyNumberSegs();
 
-        Mockito.when(copyNumberSegmentService.getCopyNumberSegmentsInSampleInStudy(Mockito.anyString(), 
-            Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), 
-            Mockito.anyString())).thenReturn(copyNumberSegList);
+        Mockito.when(copyNumberSegmentService.getCopyNumberSegmentsInSampleInStudy(Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt(),
+            Mockito.anyString(), Mockito.anyString())).thenReturn(copyNumberSegList);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/samples/test_sample_id/copy-number-segments")
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].segId").doesNotExist())
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))
@@ -115,8 +116,8 @@ public class CopyNumberSegmentControllerTest {
         BaseMeta baseMeta = new BaseMeta();
         baseMeta.setTotalCount(2);
 
-        Mockito.when(copyNumberSegmentService.getMetaCopyNumberSegmentsInSampleInStudy(Mockito.anyString(), 
-            Mockito.anyString())).thenReturn(baseMeta);
+        Mockito.when(copyNumberSegmentService.getMetaCopyNumberSegmentsInSampleInStudy(Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyString())).thenReturn(baseMeta);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/samples/test_sample_id/copy-number-segments")
             .param("projection", "META"))
@@ -129,8 +130,8 @@ public class CopyNumberSegmentControllerTest {
 
         List<CopyNumberSeg> copyNumberSegList = createExampleCopyNumberSegs();
 
-        Mockito.when(copyNumberSegmentService.fetchCopyNumberSegments(Mockito.anyListOf(String.class), 
-            Mockito.anyListOf(String.class), Mockito.anyString())).thenReturn(copyNumberSegList);
+        Mockito.when(copyNumberSegmentService.fetchCopyNumberSegments(Mockito.anyListOf(String.class),
+            Mockito.anyListOf(String.class), Mockito.anyString(), Mockito.anyString())).thenReturn(copyNumberSegList);
 
         List<SampleIdentifier> sampleIdentifiers = new ArrayList<>();
         SampleIdentifier sampleIdentifier1 = new SampleIdentifier();
@@ -147,7 +148,7 @@ public class CopyNumberSegmentControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(sampleIdentifiers)))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].segId").doesNotExist())
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))
@@ -174,7 +175,7 @@ public class CopyNumberSegmentControllerTest {
         baseMeta.setTotalCount(2);
 
         Mockito.when(copyNumberSegmentService.fetchMetaCopyNumberSegments(Mockito.anyListOf(String.class),
-            Mockito.anyListOf(String.class))).thenReturn(baseMeta);
+            Mockito.anyListOf(String.class), Mockito.anyString())).thenReturn(baseMeta);
 
         List<SampleIdentifier> sampleIdentifiers = new ArrayList<>();
         SampleIdentifier sampleIdentifier1 = new SampleIdentifier();

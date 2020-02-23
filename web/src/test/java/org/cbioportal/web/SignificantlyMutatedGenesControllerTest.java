@@ -28,7 +28,7 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration("/applicationContext-web.xml")
+@ContextConfiguration("/applicationContext-web-test.xml")
 @Configuration
 public class SignificantlyMutatedGenesControllerTest {
 
@@ -48,12 +48,13 @@ public class SignificantlyMutatedGenesControllerTest {
     private static final int TEST_NUMMUTATIONS_2 = 2;
     private static final BigDecimal TEST_P_VALUE_2 = new BigDecimal(0.2);
     private static final BigDecimal TEST_Q_VALUE_2 = new BigDecimal(0.2);
-    
+
     @Autowired
     private WebApplicationContext wac;
 
     @Autowired
     private SignificantlyMutatedGeneService significantlyMutatedGeneService;
+
     private MockMvc mockMvc;
 
     @Bean
@@ -67,7 +68,7 @@ public class SignificantlyMutatedGenesControllerTest {
         Mockito.reset(significantlyMutatedGeneService);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
-    
+
     @Test
     public void getSignificantlyMutatedGenesDefaultProjection() throws Exception {
 
@@ -95,14 +96,14 @@ public class SignificantlyMutatedGenesControllerTest {
         mutSig2.setqValue(TEST_Q_VALUE_2);
         mutSigList.add(mutSig2);
 
-        Mockito.when(significantlyMutatedGeneService.getSignificantlyMutatedGenes(Mockito.anyString(), 
+        Mockito.when(significantlyMutatedGeneService.getSignificantlyMutatedGenes(Mockito.anyString(),
             Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString()))
             .thenReturn(mutSigList);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/significantly-mutated-genes")
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].cancerStudyId").doesNotExist())
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))

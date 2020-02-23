@@ -27,11 +27,11 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration("/applicationContext-web.xml")
+@ContextConfiguration("/applicationContext-web-test.xml")
 @Configuration
 public class MrnaPercentileControllerTest {
 
-    private static final String TEST_GENETIC_PROFILE_STABLE_ID = "test_genetic_profile_stable_id_1";
+    private static final String TEST_MOLECULAR_PROFILE_STABLE_ID = "test_molecular_profile_stable_id_1";
     private static final String TEST_SAMPLE_STABLE_ID = "test_sample_stable_id_1";
     private static final int TEST_ENTREZ_GENE_ID_1 = 1;
     private static final int TEST_ENTREZ_GENE_ID_2 = 2;
@@ -45,9 +45,10 @@ public class MrnaPercentileControllerTest {
 
     @Autowired
     private MrnaPercentileService mrnaPercentileService;
-    private MockMvc mockMvc;
 
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    private MockMvc mockMvc;
 
     @Bean
     public MrnaPercentileService mrnaPercentileService() {
@@ -66,14 +67,14 @@ public class MrnaPercentileControllerTest {
 
         List<MrnaPercentile> mrnaPercentileList = new ArrayList<>();
         MrnaPercentile mrnaPercentile1 = new MrnaPercentile();
-        mrnaPercentile1.setGeneticProfileId(TEST_GENETIC_PROFILE_STABLE_ID);
+        mrnaPercentile1.setMolecularProfileId(TEST_MOLECULAR_PROFILE_STABLE_ID);
         mrnaPercentile1.setSampleId(TEST_SAMPLE_STABLE_ID);
         mrnaPercentile1.setEntrezGeneId(TEST_ENTREZ_GENE_ID_1);
         mrnaPercentile1.setzScore(TEST_Z_SCORE_1);
         mrnaPercentile1.setPercentile(TEST_PERCENTILE_1);
         mrnaPercentileList.add(mrnaPercentile1);
         MrnaPercentile mrnaPercentile2 = new MrnaPercentile();
-        mrnaPercentile2.setGeneticProfileId(TEST_GENETIC_PROFILE_STABLE_ID);
+        mrnaPercentile2.setMolecularProfileId(TEST_MOLECULAR_PROFILE_STABLE_ID);
         mrnaPercentile2.setSampleId(TEST_SAMPLE_STABLE_ID);
         mrnaPercentile2.setEntrezGeneId(TEST_ENTREZ_GENE_ID_2);
         mrnaPercentile2.setzScore(TEST_Z_SCORE_2);
@@ -87,21 +88,24 @@ public class MrnaPercentileControllerTest {
         entrezGeneIds.add(TEST_ENTREZ_GENE_ID_1);
         entrezGeneIds.add(TEST_ENTREZ_GENE_ID_2);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/genetic-profiles/test_genetic_profile_id/mrna-percentile/fetch")
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/molecular-profiles/test_molecular_profile_id/mrna-percentile/fetch")
             .param("sampleId", TEST_SAMPLE_STABLE_ID)
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(entrezGeneIds)))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].entrezGeneId").value(TEST_ENTREZ_GENE_ID_1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].geneticProfileId").value(TEST_GENETIC_PROFILE_STABLE_ID))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].molecularProfileId")
+                .value(TEST_MOLECULAR_PROFILE_STABLE_ID))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].sampleId").value(TEST_SAMPLE_STABLE_ID))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].zScore").value(TEST_Z_SCORE_1))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].percentile").value(TEST_PERCENTILE_1))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].entrezGeneId").value(TEST_ENTREZ_GENE_ID_2))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].geneticProfileId").value(TEST_GENETIC_PROFILE_STABLE_ID))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].molecularProfileId")
+                .value(TEST_MOLECULAR_PROFILE_STABLE_ID))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].sampleId").value(TEST_SAMPLE_STABLE_ID))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].zScore").value(TEST_Z_SCORE_2))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].percentile").value(TEST_PERCENTILE_2));

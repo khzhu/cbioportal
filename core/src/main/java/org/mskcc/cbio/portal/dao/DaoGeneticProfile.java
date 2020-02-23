@@ -35,6 +35,7 @@ package org.mskcc.cbio.portal.dao;
 import java.sql.*;
 import java.util.*;
 import org.mskcc.cbio.portal.model.*;
+import org.mskcc.cbio.portal.util.SpringUtil;
 
 /**
  * Analogous to and replaces the old DaoCancerType. A CancerStudy has a NAME and
@@ -49,6 +50,11 @@ public final class DaoGeneticProfile {
     private static final Map<String,GeneticProfile> byStableId = new HashMap<String,GeneticProfile>();
     private static final Map<Integer,GeneticProfile> byInternalId = new HashMap<Integer,GeneticProfile>();
     private static final Map<Integer,List<GeneticProfile>> byStudy = new HashMap<Integer,List<GeneticProfile>>();
+
+    static {
+        SpringUtil.initDataSource();
+        reCache();
+    }
 
     public static synchronized void reCache() {
         byStableId.clear();
@@ -94,9 +100,10 @@ public final class DaoGeneticProfile {
             con = JdbcUtil.getDbConnection(DaoGeneticProfile.class);
 
             pstmt = con.prepareStatement
-                    ("INSERT INTO genetic_profile (`STABLE_ID`, `CANCER_STUDY_ID`, `GENETIC_ALTERATION_TYPE`," +
-                            "`DATATYPE`, `NAME`, `DESCRIPTION`, `SHOW_PROFILE_IN_ANALYSIS_TAB`) " +
-                            "VALUES (?,?,?,?,?,?,?)");
+                    ("INSERT INTO genetic_profile (`STABLE_ID`, `CANCER_STUDY_ID`, "+
+                            "`GENETIC_ALTERATION_TYPE`, `DATATYPE`, `NAME`, `DESCRIPTION`, "+
+                            "`SHOW_PROFILE_IN_ANALYSIS_TAB`, `PIVOT_THRESHOLD`, `SORT_ORDER`, `GENERIC_ASSAY_TYPE`) " +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?)");
             pstmt.setString(1, profile.getStableId());
             pstmt.setInt(2, profile.getCancerStudyId());
             pstmt.setString(3, profile.getGeneticAlterationType().name());
@@ -104,7 +111,26 @@ public final class DaoGeneticProfile {
             pstmt.setString(5, profile.getProfileName());
             pstmt.setString(6, profile.getProfileDescription());
             pstmt.setBoolean(7, profile.showProfileInAnalysisTab());
+
+            // `pivot_threshold_value` and `value_sort_order` fields are treatment data 
+            // specific. These fields are set to null when not present in profile object.
+            if (profile.getPivotThreshold() == null) {
+                pstmt.setNull(8, java.sql.Types.FLOAT);
+                pstmt.setNull(9, java.sql.Types.INTEGER);
+            } else {
+                pstmt.setFloat(8, profile.getPivotThreshold());
+                pstmt.setString(9, profile.getSortOrder());
+            }
+
+            // `GENERIC_ASSAY_TYPE` is for Generic Assay, this field is set to null when not present in profile object.
+            if (profile.getGenericAssayType() == null) {
+                pstmt.setNull(10, java.sql.Types.VARCHAR);
+            } else {
+                pstmt.setString(10, profile.getGenericAssayType());
+            }
+            
             rows = pstmt.executeUpdate();
+
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
@@ -211,6 +237,15 @@ public final class DaoGeneticProfile {
         profileType.setGeneticAlterationType(GeneticAlterationType.valueOf(rs.getString("GENETIC_ALTERATION_TYPE")));
         profileType.setDatatype(rs.getString("DATATYPE"));
         profileType.setGeneticProfileId(rs.getInt("GENETIC_PROFILE_ID"));
+        if (rs.getFloat("PIVOT_THRESHOLD") != 0) {
+            profileType.setPivotThreshold(rs.getFloat("PIVOT_THRESHOLD"));
+        }
+        if (rs.getString("SORT_ORDER") != null && ! rs.getString("SORT_ORDER").equals("") ) {
+            profileType.setSortOrder(rs.getString("SORT_ORDER"));
+        }
+        if (rs.getString("GENERIC_ASSAY_TYPE") != null && ! rs.getString("GENERIC_ASSAY_TYPE").equals("") ) {
+            profileType.setGenericAssayType(rs.getString("GENERIC_ASSAY_TYPE"));
+        }
         return profileType;
     }
 

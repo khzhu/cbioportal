@@ -9,7 +9,6 @@ import org.cbioportal.service.PatientService;
 import org.cbioportal.service.exception.PatientNotFoundException;
 import org.cbioportal.service.exception.StudyNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +23,6 @@ public class ClinicalEventServiceImpl implements ClinicalEventService {
     private PatientService patientService;
     
     @Override
-    @PreAuthorize("hasPermission(#studyId, 'CancerStudy', 'read')")
     public List<ClinicalEvent> getAllClinicalEventsOfPatientInStudy(String studyId, String patientId, String projection, 
                                                                     Integer pageSize, Integer pageNumber, String sortBy, 
                                                                     String direction) throws PatientNotFoundException, 
@@ -48,12 +46,36 @@ public class ClinicalEventServiceImpl implements ClinicalEventService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#studyId, 'CancerStudy', 'read')")
     public BaseMeta getMetaPatientClinicalEvents(String studyId, String patientId) throws PatientNotFoundException, 
         StudyNotFoundException {
 
         patientService.getPatientInStudy(studyId, patientId);
         
         return clinicalEventRepository.getMetaPatientClinicalEvents(studyId, patientId);
+    }
+
+    @Override
+    public List<ClinicalEvent> getAllClinicalEventsInStudy(String studyId, String projection, Integer pageSize,
+                                                           Integer pageNumber, String sortBy, String direction)
+        throws StudyNotFoundException {
+
+        List<ClinicalEvent> clinicalEvents = clinicalEventRepository.getAllClinicalEventsInStudy(studyId,
+            projection, pageSize, pageNumber, sortBy, direction);
+
+        if (!projection.equals("ID")) {
+
+            List<ClinicalEventData> clinicalEventDataList = clinicalEventRepository.getDataOfClinicalEvents(
+                clinicalEvents.stream().map(ClinicalEvent::getClinicalEventId).collect(Collectors.toList()));
+
+            clinicalEvents.forEach(c -> c.setAttributes(clinicalEventDataList.stream().filter(a -> 
+                a.getClinicalEventId().equals(c.getClinicalEventId())).collect(Collectors.toList())));
+        }
+        
+        return clinicalEvents;
+    }
+
+    @Override
+    public BaseMeta getMetaClinicalEvents(String studyId) throws StudyNotFoundException {
+        return clinicalEventRepository.getMetaClinicalEvents(studyId);
     }
 }

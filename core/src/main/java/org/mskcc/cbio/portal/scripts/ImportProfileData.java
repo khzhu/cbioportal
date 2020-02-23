@@ -33,8 +33,13 @@
 package org.mskcc.cbio.portal.scripts;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Set;
+
 import joptsimple.*;
+
+import org.cbioportal.model.EntityType;
 import org.mskcc.cbio.portal.model.*;
 import org.mskcc.cbio.portal.util.*;
 
@@ -48,14 +53,15 @@ public class ImportProfileData extends ConsoleRunnable {
 
     public void run() {
         try {
-            String description = "Import 'profile' files that contain data matrices indexed by gene, case";
+            // Parse arguments
             // using a real options parser, helps avoid bugs
-
+            String description = "Import 'profile' files that contain data matrices indexed by gene, case";
             OptionSet options = ConsoleUtil.parseStandardDataAndMetaOptions(args, description, true);
             File dataFile = new File((String) options.valueOf("data"));
             File descriptorFile = new File((String) options.valueOf( "meta" ) );
             SpringUtil.initDataSource();
             ProgressMonitor.setCurrentMessage("Reading data from:  " + dataFile.getAbsolutePath());
+            // Load genetic profile and gene panel
             GeneticProfile geneticProfile = null;
             String genePanel = null;
             try {
@@ -64,14 +70,21 @@ public class ImportProfileData extends ConsoleRunnable {
             } catch (java.io.FileNotFoundException e) {
                 throw new java.io.FileNotFoundException("Descriptor file '" + descriptorFile + "' not found.");
             }
+            
+            // Print profile report
             int numLines = FileUtil.getNumLines(dataFile);
             ProgressMonitor.setCurrentMessage(
                     " --> profile id:  " + geneticProfile.getGeneticProfileId() +
                     "\n --> profile name:  " + geneticProfile.getProfileName() +
                     "\n --> genetic alteration type:  " + geneticProfile.getGeneticAlterationType().name());
             ProgressMonitor.setMaxValue(numLines);
-            if (geneticProfile.getGeneticAlterationType() == GeneticAlterationType.MUTATION_EXTENDED) {
-                ImportExtendedMutationData importer = new ImportExtendedMutationData(dataFile, geneticProfile.getGeneticProfileId(), genePanel);
+            
+            // Check genetic alteration type 
+            if (geneticProfile.getGeneticAlterationType() == GeneticAlterationType.MUTATION_EXTENDED || 
+                geneticProfile.getGeneticAlterationType() == GeneticAlterationType.MUTATION_UNCALLED) {
+                Set<String> filteredMutations = GeneticProfileReader.getVariantClassificationFilter( descriptorFile );
+                Set<String> namespaces = GeneticProfileReader.getNamespaces( descriptorFile );
+                ImportExtendedMutationData importer = new ImportExtendedMutationData(dataFile, geneticProfile.getGeneticProfileId(), genePanel, filteredMutations, namespaces);
                 String swissprotIdType = geneticProfile.getOtherMetaDataField("swissprot_identifier");
                 if (swissprotIdType != null && swissprotIdType.equals("accession")) {
                     importer.setSwissprotIsAccession(true);
@@ -82,15 +95,22 @@ public class ImportProfileData extends ConsoleRunnable {
             } else if (geneticProfile.getGeneticAlterationType() == GeneticAlterationType.FUSION) {
                 ImportFusionData importer = new ImportFusionData(dataFile, geneticProfile.getGeneticProfileId(), genePanel);
                 importer.importData();
+            } else if (geneticProfile.getGeneticAlterationType() == GeneticAlterationType.STRUCTURAL_VARIANT) {
+                ImportStructuralVariantData importer = new ImportStructuralVariantData(dataFile, geneticProfile.getGeneticProfileId(), genePanel);
+                importer.importData();
+            } else if (geneticProfile.getGeneticAlterationType() == GeneticAlterationType.GENERIC_ASSAY) {
+                // add all missing `genetic_entities` for this assay to the database
+                ImportGenericAssayEntity.importData(dataFile, geneticProfile.getGeneticAlterationType(), geneticProfile.getOtherMetaDataField("generic_entity_meta_properties"));
+                
+                ImportTabDelimData genericAssayProfileImporter = new ImportTabDelimData(dataFile, geneticProfile.getTargetLine(), geneticProfile.getGeneticProfileId(), genePanel, geneticProfile.getOtherMetaDataField("generic_entity_meta_properties"));
+                genericAssayProfileImporter.importData(numLines);
             } else {
                 ImportTabDelimData importer = new ImportTabDelimData(dataFile, geneticProfile.getTargetLine(), geneticProfile.getGeneticProfileId(), genePanel);
                 importer.importData(numLines);
             }
        }
-       catch (RuntimeException e) {
-           throw e;
-       }
        catch (Exception e) {
+    	   e.printStackTrace();
            throw new RuntimeException(e);
        }
     }

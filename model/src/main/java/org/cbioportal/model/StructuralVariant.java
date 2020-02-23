@@ -1,16 +1,7 @@
 /*
- * Copyright (c) 2016 Memorial Sloan-Kettering Cancer Center.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
- * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
- * is on an "as is" basis, and Memorial Sloan-Kettering Cancer Center has no
- * obligations to provide maintenance, support, updates, enhancements or
- * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
- * liable to any party for direct, indirect, special, incidental or
- * consequential damages, including lost profits, arising out of the use of this
- * software and its documentation, even if Memorial Sloan-Kettering Cancer
- * Center has been advised of the possibility of such damage.
+ * Copyright (c) 2018 The Hyve B.V.
+ * This code is licensed under the GNU Affero General Public License (AGPL),
+ * version 3, or (at your option) any later version.
  */
 
 /*
@@ -28,290 +19,329 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package org.cbioportal.model;
 
 import java.io.Serializable;
+import org.cbioportal.model.UniqueKeyBase;
 
-public class StructuralVariant implements Serializable {
-    private Integer sampleId;
+public class StructuralVariant extends UniqueKeyBase implements Serializable{
+
+    private String molecularProfileId;
+    private long structuralVariantId;
+    private int sampleIdInternal;
+    private String sampleId;
+    private String patientId;
+    private String studyId;
+    private Integer site1EntrezGeneId;
+    private String site1HugoSymbol;
+    private String site1EnsemblTranscriptId;
+    private Integer site1Exon;
+    private String site1Chromosome;
+    private Integer site1Position;
+    private String site1Description;
+    private Integer site2EntrezGeneId;
+    private String site2HugoSymbol;
+    private String site2EnsemblTranscriptId;
+    private Integer site2Exon;
+    private String site2Chromosome;
+    private Integer site2Position;
+    private String site2Description;
+    private String site2EffectOnFrame;
+    private String ncbiBuild;
+    private String dnaSupport;
+    private String rnaSupport;
+    private Integer normalReadCount;
+    private Integer tumorReadCount;
+    private Integer normalVariantCount;
+    private Integer tumorVariantCount;
+    private Integer normalPairedEndReadCount;
+    private Integer tumorPairedEndReadCount;
+    private Integer normalSplitReadCount;
+    private Integer tumorSplitReadCount;
     private String annotation;
     private String breakpointType;
-    private String comments;
-    private String confidenceClass;
+    private String center;
     private String connectionType;
     private String eventInfo;
-    private String mapq;
-    private Integer normalReadCount;
-    private Integer normalVariantCount;
-    private Integer pairedEndReadSupport;
-    private String site1Chrom;
-    private String site1Desc;
-    private String site1Gene;
-    private Integer site1Pos;
-    private String site2Chrom;
-    private String site2Desc;
-    private String site2Gene;
-    private Integer site2Pos;
-    private Integer splitReadSupport;
-    private String svClassName;
-    private String svDesc;
-    private Integer svLength;
-    private Integer tumorReadCount;
-    private Integer tumorVariantCount;
-    private String variantStatusName;
-    private Integer geneticProfileId;
-    private GeneticProfile geneticProfile;
-    private Gene gene1;
-    private Gene gene2;
-    private Sample sample;
+    private String variantClass;
+    private Integer length;
+    private String comments;
+    private String externalAnnotation;
+    private String driverFilter;
+    private String driverFilterAnn;
+    private String driverTiersFilter;
+    private String driverTiersFilterAnn;
 
-    public GeneticProfile getGeneticProfile() {
-        return geneticProfile;
+    public String getMolecularProfileId() {
+        return molecularProfileId;
     }
-
-    public void setGeneticProfile(GeneticProfile geneticProfile) {
-        this.geneticProfile = geneticProfile;
+    public void setMolecularProfileId(String molecularProfileId) {
+        this.molecularProfileId = molecularProfileId;
     }
-
-    public Sample getSample() {
-        return sample;
+    public long getStructuralVariantId() {
+        return structuralVariantId;
     }
-
-    public void setSample(Sample sample) {
-        this.sample = sample;
+    public void setStructuralVariantId(long structuralVariantId) {
+        this.structuralVariantId = structuralVariantId;
     }
-
-    public Gene getGene1() {
-        return gene1;
+    public int getSampleIdInternal() {
+        return sampleIdInternal;
     }
-
-    public void setGene1(Gene gene1) {
-        this.gene1 = gene1;
+    public void setSampleIdInternal(int sampleId) {
+        this.sampleIdInternal = sampleId;
     }
-
-    public Gene getGene2() {
-        return gene2;
-    }
-
-    public void setGene2(Gene gene2) {
-        this.gene2 = gene2;
-    }
-
-    public Integer getSampleId() {
+    public String getSampleId() {
         return sampleId;
     }
-
-    public void setSampleId(Integer sampleId) {
-        this.sampleId = sampleId;
+    public void setSampleId(String tumorSampleBarcode) {
+        this.sampleId = tumorSampleBarcode;
     }
-
-    public String getAnnotation() {
-        return annotation;
+    public String getPatientId() {
+        return patientId;
     }
-
-    public void setAnnotation(String annotation) {
-        this.annotation = annotation;
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
     }
-
-    public String getBreakpointType() {
-        return breakpointType;
+    public String getStudyId() {
+        return studyId;
     }
-
-    public void setBreakpointType(String breakpointType) {
-        this.breakpointType = breakpointType;
+    public void setStudyId(String studyId) {
+        this.studyId = studyId;
     }
-
-    public String getComments() {
-        return comments;
+    public Integer getSite1EntrezGeneId() {
+        return site1EntrezGeneId;
     }
-
-    public void setComments(String comments) {
-        this.comments = comments;
+    public void setSite1EntrezGeneId(Integer site1EntrezGeneId) {
+        this.site1EntrezGeneId = site1EntrezGeneId;
     }
-
-    public String getConfidenceClass() {
-        return confidenceClass;
+    public String getSite1HugoSymbol() {
+        return site1HugoSymbol;
     }
-
-    public void setConfidenceClass(String confidenceClass) {
-        this.confidenceClass = confidenceClass;
+    public void setSite1HugoSymbol(String site1HugoSymbol) {
+        this.site1HugoSymbol = site1HugoSymbol;
     }
-
-    public String getConnectionType() {
-        return connectionType;
+    public String getSite1EnsemblTranscriptId() {
+        return site1EnsemblTranscriptId;
     }
-
-    public void setConnectionType(String connectionType) {
-        this.connectionType = connectionType;
+    public void setSite1EnsemblTranscriptId(String site1TranscriptId) {
+        this.site1EnsemblTranscriptId = site1TranscriptId;
     }
-
-    public String getEventInfo() {
-        return eventInfo;
+    public Integer getSite1Exon() {
+        return site1Exon;
     }
-
-    public void setEventInfo(String eventInfo) {
-        this.eventInfo = eventInfo;
+    public void setSite1Exon(Integer site1Exon) {
+        this.site1Exon = site1Exon;
     }
-
-    public String getMapq() {
-        return mapq;
+    public String getSite1Chromosome() {
+        return site1Chromosome;
     }
-
-    public void setMapq(String mapq) {
-        this.mapq = mapq;
+    public void setSite1Chromosome(String site1Chrom) {
+        this.site1Chromosome = site1Chrom;
     }
-
+    public Integer getSite1Position() {
+        return site1Position;
+    }
+    public void setSite1Position(Integer site1Pos) {
+        this.site1Position = site1Pos;
+    }
+    public String getSite1Description() {
+        return site1Description;
+    }
+    public void setSite1Description(String site1Desc) {
+        this.site1Description = site1Desc;
+    }
+    public Integer getSite2EntrezGeneId() {
+        return site2EntrezGeneId;
+    }
+    public void setSite2EntrezGeneId(Integer site2EntrezGeneId) {
+        this.site2EntrezGeneId = site2EntrezGeneId;
+    }
+    public String getSite2HugoSymbol() {
+        return site2HugoSymbol;
+    }
+    public void setSite2HugoSymbol(String site2HugoSymbol) {
+        this.site2HugoSymbol = site2HugoSymbol;
+    }
+    public String getSite2EnsemblTranscriptId() {
+        return site2EnsemblTranscriptId;
+    }
+    public void setSite2EnsemblTranscriptId(String site2TranscriptId) {
+        this.site2EnsemblTranscriptId = site2TranscriptId;
+    }
+    public Integer getSite2Exon() {
+        return site2Exon;
+    }
+    public void setSite2Exon(Integer site2Exon) {
+        this.site2Exon = site2Exon;
+    }
+    public String getSite2Chromosome() {
+        return site2Chromosome;
+    }
+    public void setSite2Chromosome(String site2Chrom) {
+        this.site2Chromosome = site2Chrom;
+    }
+    public Integer getSite2Position() {
+        return site2Position;
+    }
+    public void setSite2Position(Integer site2Pos) {
+        this.site2Position = site2Pos;
+    }
+    public String getSite2Description() {
+        return site2Description;
+    }
+    public void setSite2Description(String site2Desc) {
+        this.site2Description = site2Desc;
+    }
+    public String getSite2EffectOnFrame() {
+        return site2EffectOnFrame;
+    }
+    public void setSite2EffectOnFrame(String site2EffectOnFrame) {
+        this.site2EffectOnFrame = site2EffectOnFrame;
+    }
+    public String getNcbiBuild() {
+        return ncbiBuild;
+    }
+    public void setNcbiBuild(String ncbiBuild) {
+        this.ncbiBuild = ncbiBuild;
+    }
+    public String getDnaSupport() {
+        return dnaSupport;
+    }
+    public void setDnaSupport(String dnaSupport) {
+        this.dnaSupport = dnaSupport;
+    }
+    public String getRnaSupport() {
+        return rnaSupport;
+    }
+    public void setRnaSupport(String rnaSupport) {
+        this.rnaSupport = rnaSupport;
+    }
     public Integer getNormalReadCount() {
         return normalReadCount;
     }
-
     public void setNormalReadCount(Integer normalReadCount) {
         this.normalReadCount = normalReadCount;
     }
-
-    public Integer getNormalVariantCount() {
-        return normalVariantCount;
-    }
-
-    public void setNormalVariantCount(Integer normalVariantCount) {
-        this.normalVariantCount = normalVariantCount;
-    }
-
-    public Integer getPairedEndReadSupport() {
-        return pairedEndReadSupport;
-    }
-
-    public void setPairedEndReadSupport(Integer pairedEndReadSupport) {
-        this.pairedEndReadSupport = pairedEndReadSupport;
-    }
-
-    public String getSite1Chrom() {
-        return site1Chrom;
-    }
-
-    public void setSite1Chrom(String site1Chrom) {
-        this.site1Chrom = site1Chrom;
-    }
-
-    public String getSite1Desc() {
-        return site1Desc;
-    }
-
-    public void setSite1Desc(String site1Desc) {
-        this.site1Desc = site1Desc;
-    }
-
-    public String getSite1Gene() {
-        return site1Gene;
-    }
-
-    public void setSite1Gene(String site1Gene) {
-        this.site1Gene = site1Gene;
-    }
-
-    public Integer getSite1Pos() {
-        return site1Pos;
-    }
-
-    public void setSite1Pos(Integer site1Pos) {
-        this.site1Pos = site1Pos;
-    }
-
-    public String getSite2Chrom() {
-        return site2Chrom;
-    }
-
-    public void setSite2Chrom(String site2Chrom) {
-        this.site2Chrom = site2Chrom;
-    }
-
-    public String getSite2Desc() {
-        return site2Desc;
-    }
-
-    public void setSite2Desc(String site2Desc) {
-        this.site2Desc = site2Desc;
-    }
-
-    public String getSite2Gene() {
-        return site2Gene;
-    }
-
-    public void setSite2Gene(String site2Gene) {
-        this.site2Gene = site2Gene;
-    }
-
-    public Integer getSite2Pos() {
-        return site2Pos;
-    }
-
-    public void setSite2Pos(Integer site2Pos) {
-        this.site2Pos = site2Pos;
-    }
-
-    public Integer getSplitReadSupport() {
-        return splitReadSupport;
-    }
-
-    public void setSplitReadSupport(Integer splitReadSupport) {
-        this.splitReadSupport = splitReadSupport;
-    }
-
-    public String getSvClassName() {
-        return svClassName;
-    }
-
-    public void setSvClassName(String svClassName) {
-        this.svClassName = svClassName;
-    }
-
-    public String getSvDesc() {
-        return svDesc;
-    }
-
-    public void setSvDesc(String svDesc) {
-        this.svDesc = svDesc;
-    }
-
-    public Integer getSvLength() {
-        return svLength;
-    }
-
-    public void setSvLength(Integer svLength) {
-        this.svLength = svLength;
-    }
-
     public Integer getTumorReadCount() {
         return tumorReadCount;
     }
-
     public void setTumorReadCount(Integer tumorReadCount) {
         this.tumorReadCount = tumorReadCount;
     }
-
+    public Integer getNormalVariantCount() {
+        return normalVariantCount;
+    }
+    public void setNormalVariantCount(Integer normalVariantCount) {
+        this.normalVariantCount = normalVariantCount;
+    }
     public Integer getTumorVariantCount() {
         return tumorVariantCount;
     }
-
     public void setTumorVariantCount(Integer tumorVariantCount) {
         this.tumorVariantCount = tumorVariantCount;
     }
-
-    public String getVariantStatusName() {
-        return variantStatusName;
+    public Integer getNormalPairedEndReadCount() {
+        return normalPairedEndReadCount;
     }
-
-    public void setVariantStatusName(String variantStatusName) {
-        this.variantStatusName = variantStatusName;
+    public void setNormalPairedEndReadCount(Integer normalPairedEndReadCount) {
+        this.normalPairedEndReadCount = normalPairedEndReadCount;
     }
-
-    public Integer getGeneticProfileId() {
-        return geneticProfileId;
+    public Integer getTumorPairedEndReadCount() {
+        return tumorPairedEndReadCount;
     }
-
-    public void setGeneticProfileId(Integer geneticProfileId) {
-        this.geneticProfileId = geneticProfileId;
+    public void setTumorPairedEndReadCount(Integer tumorPairedEndReadCount) {
+        this.tumorPairedEndReadCount = tumorPairedEndReadCount;
+    }
+    public Integer getNormalSplitReadCount() {
+        return normalSplitReadCount;
+    }
+    public void setNormalSplitReadCount(Integer normalSplitReadCount) {
+        this.normalSplitReadCount = normalSplitReadCount;
+    }
+    public Integer getTumorSplitReadCount() {
+        return tumorSplitReadCount;
+    }
+    public void setTumorSplitReadCount(Integer tumorSplitReadCount) {
+        this.tumorSplitReadCount = tumorSplitReadCount;
+    }
+    public String getAnnotation() {
+        return annotation;
+    }
+    public void setAnnotation(String annotation) {
+        this.annotation = annotation;
+    }
+    public String getBreakpointType() {
+        return breakpointType;
+    }
+    public void setBreakpointType(String breakpointType) {
+        this.breakpointType = breakpointType;
+    }
+    public String getCenter() {
+        return center;
+    }
+    public void setCenter(String center) {
+        this.center = center;
+    }
+    public String getConnectionType() {
+        return connectionType;
+    }
+    public void setConnectionType(String connectionType) {
+        this.connectionType = connectionType;
+    }
+    public String getEventInfo() {
+        return eventInfo;
+    }
+    public void setEventInfo(String eventInfo) {
+        this.eventInfo = eventInfo;
+    }
+    public String getVariantClass() {
+        return variantClass;
+    }
+    public void setVariantClass(String variantClass) {
+        this.variantClass = variantClass;
+    }
+    public Integer getLength() {
+        return length;
+    }
+    public void setLength(Integer length) {
+        this.length = length;
+    }
+    public String getComments() {
+        return comments;
+    }
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+    public String getExternalAnnotation() {
+        return externalAnnotation;
+    }
+    public void setExternalAnnotation(String externalAnnotation) {
+        this.externalAnnotation = externalAnnotation;
+    }
+    public String getDriverFilter() {
+        return driverFilter;
+    }
+    public void setDriverFilter(String driverFilter) {
+        this.driverFilter = driverFilter;
+    }
+    public String getDriverFilterAnn() {
+        return driverFilterAnn;
+    }
+    public void setDriverFilterAnn(String driverFilterAnn) {
+        this.driverFilterAnn = driverFilterAnn;
+    }
+    public String getDriverTiersFilter() {
+        return driverTiersFilter;
+    }
+    public void setDriverTiersFilter(String driverTiersFilter) {
+        this.driverTiersFilter = driverTiersFilter;
+    }
+    public String getDriverTiersFilterAnn() {
+        return driverTiersFilterAnn;
+    }
+    public void setDriverTiersFilterAnn(String driverTiersFilterAnn) {
+        this.driverTiersFilterAnn = driverTiersFilterAnn;
     }
 }

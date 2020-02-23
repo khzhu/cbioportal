@@ -155,7 +155,7 @@ public class MutationsJSON extends HttpServlet {
     	}
     }
     
-    private static int DEFAULT_THERSHOLD_NUM_SMGS = 500; // no limit if 0 or below
+    private static int DEFAULT_THRESHOLD_NUM_SMGS = 0; // no limit if 0 or below
     private void processGetSmgRequest(HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
@@ -180,20 +180,7 @@ public class MutationsJSON extends HttpServlet {
                 
                 // get all recurrently mutation genes
                 smgs = mutationModelConverter.convertSignificantlyMutatedGeneToMap(
-                        mutationRepositoryLegacy.getSignificantlyMutatedGenes(profileId, null, selectedCaseList, 2, DEFAULT_THERSHOLD_NUM_SMGS));
-
-                // get all cbio cancer genes
-                Set<Long> cbioCancerGeneIds = daoGeneOptimized.getEntrezGeneIds(
-                        daoGeneOptimized.getCbioCancerGenes());
-                cbioCancerGeneIds.removeAll(smgs.keySet());
-                if (!cbioCancerGeneIds.isEmpty()) {
-                    List<Integer> intEntrezGeneIds = new ArrayList<>(cbioCancerGeneIds.size());
-                    for (Long entrezGeneId : cbioCancerGeneIds) {
-                        intEntrezGeneIds.add(entrezGeneId.intValue());
-                    }
-                    smgs.putAll(mutationModelConverter.convertSignificantlyMutatedGeneToMap(
-                            mutationRepositoryLegacy.getSignificantlyMutatedGenes(profileId, intEntrezGeneIds, selectedCaseList, -1, -1)));
-                }
+                        mutationRepositoryLegacy.getSignificantlyMutatedGenes(profileId, null, selectedCaseList, 2, DEFAULT_THRESHOLD_NUM_SMGS));
 
                 // added mutsig results
                 mutsig = getMutSig(mutationProfile.getCancerStudyId());
@@ -224,14 +211,6 @@ public class MutationsJSON extends HttpServlet {
             
             String hugo = gene.getHugoGeneSymbolAllCaps();
             map.put("gene_symbol", hugo);
-            
-            String cytoband = gene.getCytoband();
-            map.put("cytoband", cytoband);
-            
-            int length = gene.getLength();
-            if (length>0) {
-                map.put("length", length);
-            }
             
             Integer count = Integer.parseInt(entry.getValue().get("count"));
             map.put("num_muts", count);
@@ -716,15 +695,13 @@ public class MutationsJSON extends HttpServlet {
         
         // sanger & cbio cancer gene
         boolean isSangerGene = false;
-        boolean isCbioCancerGene = false;
         try {
             isSangerGene = DaoSangerCensus.getInstance().getCancerGeneSet().containsKey(symbol);
-            isCbioCancerGene = daoGeneOptimized.isCbioCancerGene(mutation.getGene());
         } catch (DaoException ex) {
             throw new ServletException(ex);
         }
         data.get("sanger").add(isSangerGene);
-        data.get("cancer-gene").add(isCbioCancerGene);
+        data.get("cancer-gene").add(false);
         
         // drug
         data.get("drug").add(drugs);

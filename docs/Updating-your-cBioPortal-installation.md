@@ -4,8 +4,13 @@ As of release **1.1.0** cBioPortal has a Database schema update mechanism which 
 
 ## First time
 
-The first time you update from release **1.0.4** (or lower) to release **1.1.0** (or higher), you will get the following screen on the homepage after restarting your webserver:
-![Screenshot of the database schema mismatch banner](images/scripts/db_version_warning1.png)
+The first time you update from release **1.0.4** (or lower) to release **1.1.0** (or higher), you should get a an error banner page after restarting your webserver. The error should state something like: 
+
+```
+Current DB schema version: xxx 
+DB schema version expected by Portal: yyy
+```
+where `xxx` and `yyy` will be different version numbers. 
 
 If you get `DB version expected by Portal: 0` (i.e. you are building the new release from source), you need to  add a new property to your `portal.properties` file which is needed for this check. 
 
@@ -25,24 +30,20 @@ Compile your code again. After restarting the webserver the page should now stat
 
 First, make sure you have the DB connection properties correctly set in your portal.properties file (see [DB connection settings here](portal.properties-Reference.md#database-settings)).
 
-**Dependencies:** the migration script is a python script that depends on the `MySQL-python` library. If necessary, you can install it with the following commands (example for Ubuntu):
+**Dependencies:** the migration script is a Python script that depends on the `mysqlclient` library. If necessary, you can install it with the following commands (example for Ubuntu):
 ```console
-sudo apt-get install python-dev libmysqlclient-dev
-sudo pip2 install MySQL-python
+sudo apt-get install python3-dev default-libmysqlclient-dev
+sudo python3 -m pip install mysqlclient
 ```
 
-For Mac OS X, try the following:
+For macOS, try the following:
 
 ```
 brew install mysql-connector-c
-sudo pip2 install MySQL-python
+sudo python3 -m pip install mysqlclient
 ```
-
-For Mac OS X, you must also add the following to your .bash_profile:
-
-```
-export DYLD_LIBRARY_PATH=/usr/local/mysql/lib:$DYLD_LIBRARY_PATH
-```
+and see <https://github.com/PyMySQL/mysqlclient-python/blob/master/README.md#prerequisites>
+if problems occur during installation.
 
 To run the migration script first go to the scripts folder
 `<your_cbioportal_dir>/core/src/main/scripts` 

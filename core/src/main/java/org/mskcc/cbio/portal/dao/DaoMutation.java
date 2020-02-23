@@ -46,16 +46,17 @@ import java.util.regex.*;
  */
 public final class DaoMutation {
     public static final String NAN = "NaN";
+    private static final String MUTATION_COUNT_ATTR_ID = "MUTATION_COUNT";
 
     public static int addMutation(ExtendedMutation mutation, boolean newMutationEvent) throws DaoException {
         if (!MySQLbulkLoader.isBulkLoad()) {
             throw new DaoException("You have to turn on MySQLbulkLoader in order to insert mutations");
         } else {
-        	int result = 1;
-        	if (newMutationEvent) {
-        		//add event first, as mutation has a Foreign key constraint to the event:
-        		result = addMutationEvent(mutation.getEvent())+1;
-            } 
+            int result = 1;
+            if (newMutationEvent) {
+                //add event first, as mutation has a Foreign key constraint to the event:
+                result = addMutationEvent(mutation.getEvent())+1;
+            }
             MySQLbulkLoader.getMySQLbulkLoader("mutation").insertRecord(
                     Long.toString(mutation.getMutationEventId()),
                     Integer.toString(mutation.getGeneticProfileId()),
@@ -80,10 +81,17 @@ public final class DaoMutation {
                     mutation.getValidationMethod(),
                     mutation.getScore(),
                     mutation.getBamFile(),
-                    Integer.toString(mutation.getTumorAltCount()),
-                    Integer.toString(mutation.getTumorRefCount()),
-                    Integer.toString(mutation.getNormalAltCount()),
-                    Integer.toString(mutation.getNormalRefCount()));
+                    (mutation.getTumorAltCount() == null) ? null : Integer.toString(mutation.getTumorAltCount()),
+                    (mutation.getTumorRefCount() == null) ? null : Integer.toString(mutation.getTumorRefCount()),
+                    (mutation.getNormalAltCount() == null) ? null : Integer.toString(mutation.getNormalAltCount()),
+                    (mutation.getNormalRefCount() == null) ? null : Integer.toString(mutation.getNormalRefCount()),
+                    //AminoAcidChange column is not used
+                    null,
+                    mutation.getDriverFilter(),
+                    mutation.getDriverFilterAnn(),
+                    mutation.getDriverTiersFilter(),
+                    mutation.getDriverTiersFilterAnn(),
+                    mutation.getAnnotationJson());
             return result;
         }
     }
@@ -124,28 +132,60 @@ public final class DaoMutation {
         return 1;
     }
 
-    public static int calculateMutationCount (int profileId) throws DaoException {
+    public static void createMutationCountClinicalData(GeneticProfile geneticProfile) throws DaoException {
         Connection con = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
             con = JdbcUtil.getDbConnection(DaoMutation.class);
+            // add mutation count meta attribute if it does not exist
+            ClinicalAttribute clinicalAttribute = DaoClinicalAttributeMeta.getDatum(MUTATION_COUNT_ATTR_ID, geneticProfile.getCancerStudyId());
+            if (clinicalAttribute == null) {
+                ClinicalAttribute attr = new ClinicalAttribute(MUTATION_COUNT_ATTR_ID, "Mutation Count", "Mutation Count", "NUMBER",
+                    false, "30", geneticProfile.getCancerStudyId());
+                DaoClinicalAttributeMeta.addDatum(attr);
+            }
+
+            /*
+             * Add MUTATION_COUNT for each sample by checking number of
+             * mutations for the given genetic profile.
+             *
+             * We do not add the MUTATION_COUNT clinical data for the sample if
+             * it's not profiled. If it *is* profiled but there are 0
+             * mutations, add a MUTATION_COUNT with 0 value record. Do not
+             * include germline and fusions (msk internal) when counting
+             * mutations.
+             *
+             * Use REPLACE (conditional INSERT/UPDATE) which inserts
+             * new counts if they don't exist and overwrites them if they do.
+             * This is necessary for when the mutation data is split over
+             * multiple files with same profile id. Note that since
+             * clinical_sample has a key contraint on INTERNAL_ID and ATTR_ID,
+             * there can only be one MUTATION_COUNT record for each sample, so
+             * we assume each sample is in only one MUTATION_EXTENDED profile.
+             */
             pstmt = con.prepareStatement(
-                    "INSERT INTO mutation_count " +
-                    "SELECT genetic_profile.`GENETIC_PROFILE_ID`, `SAMPLE_ID`, COUNT(*) AS MUTATION_COUNT " +
-                    "FROM `mutation` , `genetic_profile` " +
-                    "WHERE mutation.`GENETIC_PROFILE_ID` = genetic_profile.`GENETIC_PROFILE_ID` " +
+                    "REPLACE `clinical_sample` " +
+                    "SELECT sample_profile.`SAMPLE_ID`, 'MUTATION_COUNT', COUNT(DISTINCT mutation_event.`CHR`, mutation_event.`START_POSITION`, " +
+                    "mutation_event.`END_POSITION`, mutation_event.`REFERENCE_ALLELE`, mutation_event.`TUMOR_SEQ_ALLELE`) AS MUTATION_COUNT " +
+                    "FROM `sample_profile` " +
+                    "LEFT JOIN mutation ON mutation.`SAMPLE_ID` = sample_profile.`SAMPLE_ID` " +
+                    "AND ( mutation.`MUTATION_STATUS` <> 'GERMLINE' OR mutation.`MUTATION_STATUS` IS NULL ) " +
+                    "LEFT JOIN mutation_event ON mutation.`MUTATION_EVENT_ID` = mutation_event.`MUTATION_EVENT_ID` " +
+                    "AND ( mutation_event.`MUTATION_TYPE` <> 'Fusion' OR mutation_event.`MUTATION_TYPE` IS NULL ) " +
+                    "INNER JOIN genetic_profile ON genetic_profile.`GENETIC_PROFILE_ID` = sample_profile.`GENETIC_PROFILE_ID` " +
+                    "WHERE genetic_profile.`GENETIC_ALTERATION_TYPE` = 'MUTATION_EXTENDED' " +
                     "AND genetic_profile.`GENETIC_PROFILE_ID`=? " +
-                    "GROUP BY genetic_profile.`GENETIC_PROFILE_ID` , `SAMPLE_ID`;");
-            pstmt.setInt(1, profileId);
-            return pstmt.executeUpdate();
+                    "GROUP BY sample_profile.`GENETIC_PROFILE_ID` , sample_profile.`SAMPLE_ID`;");
+            pstmt.setInt(1, geneticProfile.getGeneticProfileId());
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
             JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
         }
     }
-    
+
     public static int calculateMutationCountByKeyword(int profileId) throws DaoException {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -155,8 +195,8 @@ public final class DaoMutation {
             pstmt = con.prepareStatement(
                 "INSERT INTO mutation_count_by_keyword " +
                     "SELECT g2.`GENETIC_PROFILE_ID`, mutation_event.`KEYWORD`, m2.`ENTREZ_GENE_ID`, " +
-                    "IF(mutation_event.`KEYWORD` IS NULL, 0, COUNT(*)) AS KEYWORD_COUNT, (SELECT COUNT(*) " +
-                    "FROM `mutation` AS m1 , `genetic_profile` AS g1 " +
+                    "IF(mutation_event.`KEYWORD` IS NULL, 0, COUNT(DISTINCT(m2.SAMPLE_ID))) AS KEYWORD_COUNT, " +
+                    "(SELECT COUNT(DISTINCT(m1.SAMPLE_ID)) FROM `mutation` AS m1 , `genetic_profile` AS g1 " +
                     "WHERE m1.`GENETIC_PROFILE_ID` = g1.`GENETIC_PROFILE_ID` " +
                     "AND g1.`GENETIC_PROFILE_ID`= g2.`GENETIC_PROFILE_ID` AND m1.`ENTREZ_GENE_ID` = m2.`ENTREZ_GENE_ID` " +
                     "GROUP BY g1.`GENETIC_PROFILE_ID` , m1.`ENTREZ_GENE_ID`) AS GENE_COUNT " +
@@ -571,6 +611,44 @@ public final class DaoMutation {
         return events;
     }
 
+    /*
+     * Returns an existing MutationEvent record from the database or null.
+     */
+    public static ExtendedMutation.MutationEvent getMutationEvent(ExtendedMutation.MutationEvent event) throws DaoException {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            con = JdbcUtil.getDbConnection(DaoMutation.class);
+            pstmt = con.prepareStatement("SELECT * from mutation_event WHERE" +
+                                         " `ENTREZ_GENE_ID`=?" +
+                                         " AND `CHR`=?" +
+                                         " AND `START_POSITION`=?" +
+                                         " AND `END_POSITION`=?" +
+                                         " AND `TUMOR_SEQ_ALLELE`=?" +
+                                         " AND `PROTEIN_CHANGE`=?" +
+                                         " AND `MUTATION_TYPE`=?");
+            pstmt.setLong(1, event.getGene().getEntrezGeneId());
+            pstmt.setString(2, event.getChr());
+            pstmt.setLong(3, event.getStartPosition());
+            pstmt.setLong(4, event.getEndPosition());
+            pstmt.setString(5, event.getTumorSeqAllele());
+            pstmt.setString(6, event.getProteinChange());
+            pstmt.setString(7, event.getMutationType());
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return extractMutationEvent(rs);
+            }
+            else {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
+        }
+    }
+
     public static long getLargestMutationEventId() throws DaoException {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -615,6 +693,7 @@ public final class DaoMutation {
             mutation.setTumorRefCount(rs.getInt("TUMOR_REF_COUNT"));
             mutation.setNormalAltCount(rs.getInt("NORMAL_ALT_COUNT"));
             mutation.setNormalRefCount(rs.getInt("NORMAL_REF_COUNT"));
+            mutation.setAnnotationJson(rs.getString("ANNOTATION_JSON"));
             return mutation;
         }
         catch(NullPointerException e) {
@@ -753,46 +832,6 @@ public final class DaoMutation {
                 return rs.getInt(1);
             }
             return 0;
-        } catch (SQLException e) {
-            throw new DaoException(e);
-        } finally {
-            JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
-        }
-    }
-
-    /**
-     * return the number of mutations for each sample
-     * @param sampleIds if null, return all case available
-     * @param profileId
-     * @return Map &lt; sample id, mutation count &gt;
-     * @throws DaoException
-     * @deprecated  We believe that this method is no longer called by any part of the codebase, and it will soon be deleted.
-     */
-    @Deprecated
-    public static Map<Integer, Integer> countMutationEvents(int profileId, Collection<Integer> sampleIds) throws DaoException {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        try {
-            con = JdbcUtil.getDbConnection(DaoMutation.class);
-            String sql;
-            if (sampleIds==null) {
-                sql = "SELECT `SAMPLE_ID`, `MUTATION_COUNT` FROM mutation_count" +
-                        " WHERE `GENETIC_PROFILE_ID`=" + profileId;
-            } else {
-                sql = "SELECT `SAMPLE_ID`, `MUTATION_COUNT` FROM mutation_count" +
-                        " WHERE `GENETIC_PROFILE_ID`=" + profileId +
-                        " AND `SAMPLE_ID` IN ('" + StringUtils.join(sampleIds,"','") + "')";
-            }
-            pstmt = con.prepareStatement(sql);
-            Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                map.put(rs.getInt(1), rs.getInt(2));
-            }
-            return map;
-        } catch (NullPointerException e) {
-            throw new DaoException(e);
         } catch (SQLException e) {
             throw new DaoException(e);
         } finally {
@@ -968,7 +1007,7 @@ public final class DaoMutation {
      * @param profileId
      * @return Map &lt; event id, sampleCount &gt;
      * @throws DaoException
-     * 
+     *
      * @deprecated  We believe that this method is no longer called by any part of the codebase, and it will soon be deleted.
      */
     @Deprecated
@@ -1426,5 +1465,141 @@ public final class DaoMutation {
         } finally {
             JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
         }
+    }
+
+    /**
+     * Gets all tiers in alphabetical order.
+     *
+     * @param
+     * @return Ordered list of tiers.
+     * @throws DaoException Database Error.
+     */
+    public static List<String> getTiers(String _cancerStudyStableIds) throws DaoException {
+        String[] cancerStudyStableIds = _cancerStudyStableIds.split(",");
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<String> tiers = new ArrayList<String>();
+        ArrayList<GeneticProfile> geneticProfiles = new ArrayList<>();
+        for (String cancerStudyStableId: cancerStudyStableIds) {
+            geneticProfiles.addAll(DaoGeneticProfile.getAllGeneticProfiles(
+                DaoCancerStudy.getCancerStudyByStableId(cancerStudyStableId).getInternalId()
+            ));
+        }
+        for (GeneticProfile geneticProfile : geneticProfiles) {
+            if (geneticProfile.getGeneticAlterationType().equals(GeneticAlterationType.MUTATION_EXTENDED)) {
+                try {
+                    con = JdbcUtil.getDbConnection(DaoMutation.class);
+                    pstmt = con.prepareStatement(
+                            "SELECT DISTINCT DRIVER_TIERS_FILTER FROM mutation "
+                            + "WHERE DRIVER_TIERS_FILTER is not NULL AND DRIVER_TIERS_FILTER <> '' AND GENETIC_PROFILE_ID=? "
+                            + "ORDER BY DRIVER_TIERS_FILTER");
+                    pstmt.setLong(1, geneticProfile.getGeneticProfileId());
+                    rs = pstmt.executeQuery();
+                    while (rs.next()) {
+                        tiers.add(rs.getString("DRIVER_TIERS_FILTER"));
+                    }
+                } catch (SQLException e) {
+                    throw new DaoException(e);
+                } finally {
+                    JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
+                }
+            }
+        }
+
+        return tiers;
+    }
+
+    /**
+     * Returns the number of tiers in the cancer study..
+     *
+     * @param
+     * @return Ordered list of tiers.
+     * @throws DaoException Database Error.
+     */
+    public static int numTiers(String _cancerStudyStableIds) throws DaoException {
+        List<String> tiers = getTiers(_cancerStudyStableIds);
+        return tiers.size();
+    }
+
+    /**
+     * Returns true if there are "Putative_Driver" or "Putative_Passenger" values in the
+     * binary annotation column. Otherwise, it returns false.
+     *
+     * @param
+     * @return Ordered list of tiers.
+     * @throws DaoException Database Error.
+     */
+    public static boolean hasDriverAnnotations(String _cancerStudyStableIds) throws DaoException {
+        String[] cancerStudyStableIds = _cancerStudyStableIds.split(",");
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<String> driverValues = new ArrayList<String>();
+        ArrayList<GeneticProfile> geneticProfiles = new ArrayList<>();
+        for (String cancerStudyStableId: cancerStudyStableIds) {
+            geneticProfiles.addAll(
+                DaoGeneticProfile.getAllGeneticProfiles(DaoCancerStudy.getCancerStudyByStableId(cancerStudyStableId).getInternalId())
+            );
+        }
+        for (GeneticProfile geneticProfile : geneticProfiles) {
+            if (geneticProfile.getGeneticAlterationType().equals(GeneticAlterationType.MUTATION_EXTENDED)) {
+                try {
+                    con = JdbcUtil.getDbConnection(DaoMutation.class);
+                    pstmt = con.prepareStatement(
+                            "SELECT DISTINCT DRIVER_FILTER FROM mutation "
+                            + "WHERE DRIVER_FILTER is not NULL AND DRIVER_FILTER <> '' AND GENETIC_PROFILE_ID=? ");
+                    pstmt.setLong(1, geneticProfile.getGeneticProfileId());
+                    rs = pstmt.executeQuery();
+                    while (rs.next()) {
+                        driverValues.add(rs.getString("DRIVER_FILTER"));
+                    }
+                } catch (SQLException e) {
+                    throw new DaoException(e);
+                } finally {
+                    JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
+                }
+            }
+        }
+        if (driverValues.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if there are duplicates in `mutation_event`.
+     * Compares count(*) of records in `mutation_event` against the count(distinct ...)
+     * records based on the fields specified below.
+     *
+     * If the counts do not match then SQL statement returns 0 (false), otherwise returns 1 (true).
+     * @return
+     * @throws DaoException
+     */
+    public static boolean hasDuplicateMutationEvents() throws DaoException {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        Integer sqlQueryResult = -1; // default = -1 to indicate mismatched counts from db table
+        try {
+            con = JdbcUtil.getDbConnection(DaoMutation.class);
+            pstmt = con.prepareStatement(
+                    "SELECT "
+                    + "(SELECT COUNT(*) FROM mutation_event) = "
+                    + "(SELECT COUNT(DISTINCT ENTREZ_GENE_ID, CHR, START_POSITION, END_POSITION, TUMOR_SEQ_ALLELE, PROTEIN_CHANGE, MUTATION_TYPE) FROM mutation_event)");
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                sqlQueryResult = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            JdbcUtil.closeAll(DaoMutation.class, con, pstmt, rs);
+        }
+        if (sqlQueryResult == -1) {
+            throw new DaoException("Error occurred while executing SQL query to detect duplicate records in `mutation_event`");
+        }
+        return !(sqlQueryResult > 0);
     }
 }

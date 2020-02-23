@@ -33,27 +33,24 @@ public class GeneServiceImplTest extends BaseServiceImplTest {
 
         List<Gene> expectedGeneList = new ArrayList<>();
         Gene gene = new Gene();
+        gene.setHugoGeneSymbol(HUGO_GENE_SYMBOL);
         expectedGeneList.add(gene);
 
-        Mockito.when(geneRepository.getAllGenes(ALIAS, PROJECTION, PAGE_SIZE, PAGE_NUMBER, SORT, DIRECTION))
+        Mockito.when(geneRepository.getAllGenes(KEYWORD, ALIAS, PROJECTION, PAGE_SIZE, PAGE_NUMBER, SORT, DIRECTION))
                 .thenReturn(expectedGeneList);
-        Mockito.doAnswer(invocationOnMock -> {
-            ((Gene) invocationOnMock.getArguments()[0]).setChromosome("19");
-            return null;
-        }).when(chromosomeCalculator).setChromosome(gene);
 
-        List<Gene> result = geneService.getAllGenes(ALIAS, PROJECTION, PAGE_SIZE, PAGE_NUMBER, SORT, DIRECTION);
+        List<Gene> result = geneService.getAllGenes(KEYWORD, ALIAS, PROJECTION, PAGE_SIZE, PAGE_NUMBER, SORT, DIRECTION);
 
         Assert.assertEquals(expectedGeneList, result);
-        Assert.assertEquals("19", result.get(0).getChromosome());
     }
 
     @Test
     public void getMetaGenes() throws Exception {
 
         BaseMeta expectedBaseMeta = new BaseMeta();
-        Mockito.when(geneRepository.getMetaGenes(ALIAS)).thenReturn(expectedBaseMeta);
-        BaseMeta result = geneService.getMetaGenes(ALIAS);
+        Mockito.when(geneRepository.getMetaGenes(null, ALIAS)).thenReturn(expectedBaseMeta);
+        
+        BaseMeta result = geneService.getMetaGenes(null, ALIAS);
 
         Assert.assertEquals(expectedBaseMeta, result);
     }
@@ -61,25 +58,20 @@ public class GeneServiceImplTest extends BaseServiceImplTest {
     @Test(expected = GeneNotFoundException.class)
     public void getGeneByEntrezGeneIdNotFound() throws Exception {
 
-        Mockito.when(geneRepository.getGeneByEntrezGeneId(ENTREZ_GENE_ID)).thenReturn(null);
+        Mockito.when(geneRepository.getGeneByEntrezGeneId(ENTREZ_GENE_ID_1)).thenReturn(null);
 
-        geneService.getGene(ENTREZ_GENE_ID.toString());
+        geneService.getGene(ENTREZ_GENE_ID_1.toString());
     }
 
     @Test
     public void getGeneByEntrezGeneId() throws Exception {
 
         Gene expectedGene = new Gene();
-        Mockito.when(geneRepository.getGeneByEntrezGeneId(ENTREZ_GENE_ID)).thenReturn(expectedGene);
-        Mockito.doAnswer(invocationOnMock -> {
-            ((Gene) invocationOnMock.getArguments()[0]).setChromosome("X");
-            return null;
-        }).when(chromosomeCalculator).setChromosome(expectedGene);
+        Mockito.when(geneRepository.getGeneByEntrezGeneId(ENTREZ_GENE_ID_1)).thenReturn(expectedGene);
         
-        Gene result = geneService.getGene(ENTREZ_GENE_ID.toString());
+        Gene result = geneService.getGene(ENTREZ_GENE_ID_1.toString());
 
         Assert.assertEquals(expectedGene, result);
-        Assert.assertEquals("X", result.getChromosome());
     }
 
     @Test(expected = GeneNotFoundException.class)
@@ -95,26 +87,21 @@ public class GeneServiceImplTest extends BaseServiceImplTest {
 
         Gene expectedGene = new Gene();
         Mockito.when(geneRepository.getGeneByHugoGeneSymbol(HUGO_GENE_SYMBOL)).thenReturn(expectedGene);
-        Mockito.doAnswer(invocationOnMock -> {
-            ((Gene) invocationOnMock.getArguments()[0]).setChromosome("Y");
-            return null;
-        }).when(chromosomeCalculator).setChromosome(expectedGene);
         
         Gene result = geneService.getGene(HUGO_GENE_SYMBOL);
 
         Assert.assertEquals(expectedGene, result);
-        Assert.assertEquals("Y", result.getChromosome());
     }
 
     @Test
     public void getAliasesOfGeneByEntrezGeneId() throws Exception {
 
         Gene expectedGene = new Gene();
-        Mockito.when(geneRepository.getGeneByEntrezGeneId(ENTREZ_GENE_ID)).thenReturn(expectedGene);
+        Mockito.when(geneRepository.getGeneByEntrezGeneId(ENTREZ_GENE_ID_1)).thenReturn(expectedGene);
         List<String> expectedAliases = new ArrayList<>();
         expectedAliases.add("alias");
-        Mockito.when(geneRepository.getAliasesOfGeneByEntrezGeneId(ENTREZ_GENE_ID)).thenReturn(expectedAliases);
-        List<String> result = geneService.getAliasesOfGene(ENTREZ_GENE_ID.toString());
+        Mockito.when(geneRepository.getAliasesOfGeneByEntrezGeneId(ENTREZ_GENE_ID_1)).thenReturn(expectedAliases);
+        List<String> result = geneService.getAliasesOfGene(ENTREZ_GENE_ID_1.toString());
 
         Assert.assertEquals(expectedAliases, result);
     }
@@ -122,8 +109,8 @@ public class GeneServiceImplTest extends BaseServiceImplTest {
     @Test(expected = GeneNotFoundException.class)
     public void getAliasesOfGeneByEntrezGeneIdGeneNotFound() throws Exception {
         
-        Mockito.when(geneRepository.getGeneByEntrezGeneId(ENTREZ_GENE_ID)).thenReturn(null);
-        geneService.getAliasesOfGene(ENTREZ_GENE_ID.toString());
+        Mockito.when(geneRepository.getGeneByEntrezGeneId(ENTREZ_GENE_ID_1)).thenReturn(null);
+        geneService.getAliasesOfGene(ENTREZ_GENE_ID_1.toString());
     }
 
     @Test
@@ -151,15 +138,12 @@ public class GeneServiceImplTest extends BaseServiceImplTest {
         
         List<Gene> expectedGeneList = new ArrayList<>();
         Gene gene = new Gene();
+        gene.setHugoGeneSymbol(HUGO_GENE_SYMBOL);
         expectedGeneList.add(gene);
 
         List<String> geneIds = new ArrayList<>();
         geneIds.add(HUGO_GENE_SYMBOL);
         
-        Mockito.doAnswer(invocationOnMock -> {
-            ((Gene) invocationOnMock.getArguments()[0]).setChromosome("12");
-            return null;
-        }).when(chromosomeCalculator).setChromosome(gene);
 
         Mockito.when(geneRepository.fetchGenesByHugoGeneSymbols(Arrays.asList(HUGO_GENE_SYMBOL), PROJECTION))
                 .thenReturn(expectedGeneList);
@@ -168,7 +152,7 @@ public class GeneServiceImplTest extends BaseServiceImplTest {
 
         Assert.assertEquals(1, result.size());
         Assert.assertEquals(gene, result.get(0));
-        Assert.assertEquals("12", result.get(0).getChromosome());
+
     }
 
     @Test

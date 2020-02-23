@@ -70,9 +70,6 @@ public class ImportProteinArrayData {
         BufferedReader buf = new BufferedReader(reader);
         String line = buf.readLine();
         String[] sampleIds = line.split("\t");
-//        sampleIds = Arrays.copyOfRange(sampleIds, 1, sampleIds.length);
-//        ImportDataUtil.addPatients(sampleIds, profile.getGeneticProfileId());
-//        ImportDataUtil.addSamples(sampleIds, profile.getGeneticProfileId());
         Sample[] samples = new Sample[sampleIds.length-1];
         for (int i=1; i<sampleIds.length; i++) {
             samples[i-1] = DaoSample.getSampleByCancerStudyAndSampleId(cancerStudyId, StableIdUtil.getSampleId(sampleIds[i]));
@@ -165,7 +162,7 @@ public class ImportProteinArrayData {
                             StringUtils.join(genes, "/"), residue, null);
             daoPAI.addProteinArrayInfo(pai);
             for (String symbol : genes) {
-                CanonicalGene gene = daoGene.getNonAmbiguousGene(symbol, null);
+                CanonicalGene gene = daoGene.getNonAmbiguousGene(symbol, true);
                 if (gene==null) {
                     System.err.println(symbol+" not exist");
                     continue;

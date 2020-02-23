@@ -2,10 +2,12 @@ package org.cbioportal.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import javax.validation.constraints.NotNull;
 
 public class CancerStudy implements Serializable {
 
     private Integer cancerStudyId;
+    @NotNull
     private String cancerStudyIdentifier;
     private String typeOfCancerId;
     private String name;
@@ -21,12 +23,14 @@ public class CancerStudy implements Serializable {
     private Integer allSampleCount;
     private Integer sequencedSampleCount;
     private Integer cnaSampleCount;
+    private Integer mrnaRnaSeqSampleCount;
     private Integer mrnaRnaSeqV2SampleCount;
     private Integer mrnaMicroarraySampleCount;
     private Integer miRnaSampleCount;
     private Integer methylationHm27SampleCount;
     private Integer rppaSampleCount;
     private Integer completeSampleCount;
+    private String referenceGenome;
 
     public Integer getCancerStudyId() {
         return cancerStudyId;
@@ -156,6 +160,14 @@ public class CancerStudy implements Serializable {
         this.cnaSampleCount = cnaSampleCount;
     }
 
+    public Integer getMrnaRnaSeqSampleCount() {
+        return mrnaRnaSeqSampleCount;
+    }
+
+    public void setMrnaRnaSeqSampleCount(Integer mrnaRnaSeqSampleCount) {
+        this.mrnaRnaSeqSampleCount = mrnaRnaSeqSampleCount;
+    }
+
     public Integer getMrnaRnaSeqV2SampleCount() {
         return mrnaRnaSeqV2SampleCount;
     }
@@ -203,4 +215,8 @@ public class CancerStudy implements Serializable {
     public void setCompleteSampleCount(Integer completeSampleCount) {
         this.completeSampleCount = completeSampleCount;
     }
+    
+    public String getReferenceGenome() { return  referenceGenome; }
+    
+    public void setReferenceGenome(String referenceGenome) { this.referenceGenome = referenceGenome; }
 }

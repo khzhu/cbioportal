@@ -32,10 +32,13 @@
 
 package org.mskcc.cbio.portal.model;
 
-// Copied to org.cbioportal.model.GeneticProfile.GeneticAlterationType, if you alter this,
+// Copied to org.cbioportal.model.MolecularProfile.GeneticAlterationType, if you alter this,
 // don't forget to change the other one too
 public enum GeneticAlterationType {
     MUTATION_EXTENDED,
+    // uncalled mutations (mskcc internal) for showing read counts even if
+    // mutation wasn't called
+    MUTATION_UNCALLED,
     FUSION,
     STRUCTURAL_VARIANT,
     COPY_NUMBER_ALTERATION,
@@ -48,5 +51,7 @@ public enum GeneticAlterationType {
     PHOSPHORYLATION,
     PROTEIN_LEVEL,
     PROTEIN_ARRAY_PROTEIN_LEVEL,
-    PROTEIN_ARRAY_PHOSPHORYLATION;
+    PROTEIN_ARRAY_PHOSPHORYLATION,
+    GENESET_SCORE,
+    GENERIC_ASSAY
 };

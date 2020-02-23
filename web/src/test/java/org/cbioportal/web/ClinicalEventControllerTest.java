@@ -28,7 +28,7 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration("/applicationContext-web.xml")
+@ContextConfiguration("/applicationContext-web-test.xml")
 @Configuration
 public class ClinicalEventControllerTest {
 
@@ -57,6 +57,7 @@ public class ClinicalEventControllerTest {
 
     @Autowired
     private ClinicalEventService clinicalEventService;
+
     private MockMvc mockMvc;
 
     @Bean
@@ -70,10 +71,110 @@ public class ClinicalEventControllerTest {
         Mockito.reset(clinicalEventService);
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
-    
+
     @Test
     public void getAllClinicalEventsOfPatientInStudy() throws Exception {
 
+        List<ClinicalEvent> clinicalEventList = createExampleClinicalEventList();
+
+        Mockito.when(clinicalEventService.getAllClinicalEventsOfPatientInStudy(Mockito.anyString(), Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString()))
+            .thenReturn(clinicalEventList);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/patients/test_patient_id/clinical-events")
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].clinicalEventId").doesNotExist())
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].patientId").value(TEST_PATIENT_ID_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].eventType").value(TEST_EVENT_TYPE_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].startNumberOfDaysSinceDiagnosis").value(TEST_START_DATE_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].endNumberOfDaysSinceDiagnosis").value(TEST_END_DATE_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[0].key").value(TEST_KEY_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[0].value").value(TEST_VALUE_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[1].key").value(TEST_KEY_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[1].value").value(TEST_VALUE_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].clinicalEventId").doesNotExist())
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].patientId").value(TEST_PATIENT_ID_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].eventType").value(TEST_EVENT_TYPE_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].startNumberOfDaysSinceDiagnosis").value(TEST_START_DATE_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].endNumberOfDaysSinceDiagnosis").value(TEST_END_DATE_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[0].key").value(TEST_KEY_3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[0].value").value(TEST_VALUE_3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[1].key").value(TEST_KEY_4))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[1].value").value(TEST_VALUE_4));
+    }
+
+    @Test
+    public void getAllClinicalEventsOfPatientInStudyMetaProjection() throws Exception {
+
+        BaseMeta baseMeta = new BaseMeta();
+        baseMeta.setTotalCount(2);
+
+        Mockito.when(clinicalEventService.getMetaPatientClinicalEvents(Mockito.anyString(), Mockito.anyString()))
+            .thenReturn(baseMeta);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/patients/test_patient_id/clinical-events")
+            .param("projection", "META"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header().string(HeaderKeyConstants.TOTAL_COUNT, "2"));
+    }
+
+    @Test
+    public void getAllClinicalEventsInStudy() throws Exception {
+
+        List<ClinicalEvent> clinicalEventList = createExampleClinicalEventList();
+
+        Mockito.when(clinicalEventService.getAllClinicalEventsInStudy(Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString()))
+            .thenReturn(clinicalEventList);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/clinical-events")
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].clinicalEventId").doesNotExist())
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].patientId").value(TEST_PATIENT_ID_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].eventType").value(TEST_EVENT_TYPE_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].startNumberOfDaysSinceDiagnosis").value(TEST_START_DATE_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].endNumberOfDaysSinceDiagnosis").value(TEST_END_DATE_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[0].key").value(TEST_KEY_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[0].value").value(TEST_VALUE_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[1].key").value(TEST_KEY_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[1].value").value(TEST_VALUE_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].clinicalEventId").doesNotExist())
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].patientId").value(TEST_PATIENT_ID_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].eventType").value(TEST_EVENT_TYPE_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].startNumberOfDaysSinceDiagnosis").value(TEST_START_DATE_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].endNumberOfDaysSinceDiagnosis").value(TEST_END_DATE_2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[0].key").value(TEST_KEY_3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[0].value").value(TEST_VALUE_3))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[1].key").value(TEST_KEY_4))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[1].value").value(TEST_VALUE_4));
+    }
+
+    @Test
+    public void getAllClinicalEventsInStudyMetaProjection() throws Exception {
+
+        BaseMeta baseMeta = new BaseMeta();
+        baseMeta.setTotalCount(2);
+
+        Mockito.when(clinicalEventService.getMetaClinicalEvents(Mockito.anyString()))
+            .thenReturn(baseMeta);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/clinical-events")
+            .param("projection", "META"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header().string(HeaderKeyConstants.TOTAL_COUNT, "2"));
+    }
+
+    private final List<ClinicalEvent> createExampleClinicalEventList() {
         List<ClinicalEvent> clinicalEventList = new ArrayList<>();
         ClinicalEvent clinicalEvent1 = new ClinicalEvent();
         clinicalEvent1.setClinicalEventId(TEST_CLINICAL_EVENT_ID_1);
@@ -115,50 +216,6 @@ public class ClinicalEventControllerTest {
         clinicalEventDataList2.add(clinicalEventData4);
         clinicalEvent2.setAttributes(clinicalEventDataList2);
         clinicalEventList.add(clinicalEvent2);
-
-        Mockito.when(clinicalEventService.getAllClinicalEventsOfPatientInStudy(Mockito.anyString(), Mockito.anyString(),
-            Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString()))
-            .thenReturn(clinicalEventList);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/patients/test_patient_id/clinical-events")
-            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].clinicalEventId").doesNotExist())
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].patientId").value(TEST_PATIENT_ID_1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].eventType").value(TEST_EVENT_TYPE_1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].startNumberOfDaysSinceDiagnosis").value(TEST_START_DATE_1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].endNumberOfDaysSinceDiagnosis").value(TEST_END_DATE_1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[0].key").value(TEST_KEY_1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[0].value").value(TEST_VALUE_1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[1].key").value(TEST_KEY_2))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].attributes[1].value").value(TEST_VALUE_2))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].clinicalEventId").doesNotExist())
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].studyId").value(TEST_CANCER_STUDY_IDENTIFIER_1))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].patientId").value(TEST_PATIENT_ID_2))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].eventType").value(TEST_EVENT_TYPE_2))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].startNumberOfDaysSinceDiagnosis").value(TEST_START_DATE_2))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].endNumberOfDaysSinceDiagnosis").value(TEST_END_DATE_2))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[0].key").value(TEST_KEY_3))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[0].value").value(TEST_VALUE_3))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[1].key").value(TEST_KEY_4))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].attributes[1].value").value(TEST_VALUE_4));
-    }
-
-    @Test
-    public void getAllClinicalEventsOfPatientInStudyMetaProjection() throws Exception {
-
-        BaseMeta baseMeta = new BaseMeta();
-        baseMeta.setTotalCount(2);
-
-        Mockito.when(clinicalEventService.getMetaPatientClinicalEvents(Mockito.anyString(), Mockito.anyString()))
-            .thenReturn(baseMeta);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/studies/test_study_id/patients/test_patient_id/clinical-events")
-            .param("projection", "META"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().string(HeaderKeyConstants.TOTAL_COUNT, "2"));
+        return clinicalEventList;
     }
 }

@@ -3,13 +3,8 @@ package org.cbioportal.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Mutation implements Serializable {
-
-    private Integer geneticProfileId;
-    private String geneticProfileStableId;
-    private Integer sampleId;
-    private String sampleStableId;
-    private Integer entrezGeneId;
+public class Mutation extends Alteration implements Serializable {
+    
     private String center;
     private String mutationStatus;
     private String validationStatus;
@@ -18,6 +13,7 @@ public class Mutation implements Serializable {
     private Integer normalAltCount;
     private Integer normalRefCount;
     private String aminoAcidChange;
+    private String chr;
     private Long startPosition;
     private Long endPosition;
     private String referenceAllele;
@@ -35,48 +31,12 @@ public class Mutation implements Serializable {
     private Integer oncotatorProteinPosStart;
     private Integer oncotatorProteinPosEnd;
     private String keyword;
-    private Gene gene;
-
-    public Integer getGeneticProfileId() {
-        return geneticProfileId;
-    }
-
-    public void setGeneticProfileId(Integer geneticProfileId) {
-        this.geneticProfileId = geneticProfileId;
-    }
-
-    public String getGeneticProfileStableId() {
-        return geneticProfileStableId;
-    }
-
-    public void setGeneticProfileStableId(String geneticProfileStableId) {
-        this.geneticProfileStableId = geneticProfileStableId;
-    }
-
-    public Integer getSampleId() {
-        return sampleId;
-    }
-
-    public void setSampleId(Integer sampleId) {
-        this.sampleId = sampleId;
-    }
-
-    public String getSampleStableId() {
-        return sampleStableId;
-    }
-
-    public void setSampleStableId(String sampleStableId) {
-        this.sampleStableId = sampleStableId;
-    }
-
-    public Integer getEntrezGeneId() {
-        return entrezGeneId;
-    }
-
-    public void setEntrezGeneId(Integer entrezGeneId) {
-        this.entrezGeneId = entrezGeneId;
-    }
-
+    private String driverFilter;
+    private String driverFilterAnnotation;
+    private String driverTiersFilter;
+    private String driverTiersFilterAnnotation;
+    private AlleleSpecificCopyNumber alleleSpecificCopyNumber;
+    
     public String getCenter() {
         return center;
     }
@@ -140,6 +100,10 @@ public class Mutation implements Serializable {
     public void setAminoAcidChange(String aminoAcidChange) {
         this.aminoAcidChange = aminoAcidChange;
     }
+    
+    public String getChr() { return chr; }
+    
+    public void setChr(String chr) { this.chr = chr; }
 
     public Long getStartPosition() {
         return startPosition;
@@ -277,11 +241,43 @@ public class Mutation implements Serializable {
         this.keyword = keyword;
     }
     
-    public Gene getGene() {
-        return gene;
+    public String getDriverFilter() {
+        return driverFilter;
+    }
+    
+    public void setDriverFilter(String driverFilter) {
+        this.driverFilter = driverFilter;
+    }
+    
+    public String getDriverFilterAnnotation() {
+        return driverFilterAnnotation;
+    }
+    
+    public void setDriverFilterAnnotation(String driverFilterAnnotation) {
+        this.driverFilterAnnotation = driverFilterAnnotation;
+    }
+    
+    public String getDriverTiersFilter() {
+        return driverTiersFilter;
+    }
+    
+    public void setDriverTiersFilter(String driverTiersFilter) {
+        this.driverTiersFilter = driverTiersFilter;
+    }
+    
+    public String getDriverTiersFilterAnnotation() {
+        return driverTiersFilterAnnotation;
+    }
+    
+    public void setDriverTiersFilterAnnotation(String driverTiersFilterAnnotation) {
+        this.driverTiersFilterAnnotation = driverTiersFilterAnnotation;
     }
 
-    public void setGene(Gene gene) {
-        this.gene = gene;
+    public AlleleSpecificCopyNumber getAlleleSpecificCopyNumber() {
+        return alleleSpecificCopyNumber;
+    }
+
+    public void setAlleleSpecificCopyNumber(AlleleSpecificCopyNumber alleleSpecificCopyNumber) {
+        this.alleleSpecificCopyNumber = alleleSpecificCopyNumber;
     }
 }

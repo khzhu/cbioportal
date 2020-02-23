@@ -135,6 +135,8 @@ function ServicePresenter(baseURL, markdownDocumentation){
             console.log(new Date() + ': successfully retrieved the markdownpage!');
             // the resultPage is stored in result.response
             var resultPage = result.response;
+            // insert zero-width space character between | and ` to fix parser bug with tables and backticks
+            resultPage = resultPage.replace(/\|\s*`/g, "|&#8203;`");
             // check whether it's a markdown page. If so, convert it; otherwise use the results as the htmlPage
             if(markdownDocumentation==='true') {
                 htmlPage = markdown2html(resultPage);
@@ -181,7 +183,7 @@ function ServicePresenter(baseURL, markdownDocumentation){
 
     // convert markdown to html using the showdown library
     function markdown2html(markdownPage){
-        var converter = new showdown.Converter({extensions: ['github']}),
+        var converter = new showdown.Converter({extensions: ['github'], tables:true}),
             text      = markdownPage,
             html      = converter.makeHtml(text);
         return html;

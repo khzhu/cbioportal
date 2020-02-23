@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import org.cbioportal.model.Gene;
 import org.cbioportal.service.GeneService;
 import org.cbioportal.service.exception.GeneNotFoundException;
+import org.cbioportal.service.exception.GeneWithMultipleEntrezIdsException;
 import org.cbioportal.web.config.annotation.PublicApi;
 import org.cbioportal.web.parameter.Direction;
 import org.cbioportal.web.parameter.GeneIdType;
@@ -34,7 +35,7 @@ import java.util.List;
 @PublicApi
 @RestController
 @Validated
-@Api(tags = "Genes", description = " ")
+@Api(tags = "N. Genes", description = " ")
 public class GeneController {
 
     private static final int GENE_MAX_PAGE_SIZE = 100000;
@@ -46,6 +47,8 @@ public class GeneController {
     @RequestMapping(value = "/genes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Get all genes")
     public ResponseEntity<List<Gene>> getAllGenes(
+        @ApiParam("Search keyword that applies to hugo gene symbol of the genes")
+        @RequestParam(required = false) String keyword,
         @ApiParam("Alias of the gene")
         @RequestParam(required = false) String alias,
         @ApiParam("Level of detail of the response")
@@ -64,12 +67,12 @@ public class GeneController {
 
         if (projection == Projection.META) {
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add(HeaderKeyConstants.TOTAL_COUNT, geneService.getMetaGenes(alias).getTotalCount()
+            responseHeaders.add(HeaderKeyConstants.TOTAL_COUNT, geneService.getMetaGenes(keyword, alias).getTotalCount()
                 .toString());
             return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(
-                geneService.getAllGenes(alias, projection.name(), pageSize, pageNumber,
+                geneService.getAllGenes(keyword, alias, projection.name(), pageSize, pageNumber,
                     sortBy == null ? null : sortBy.getOriginalValue(), direction.name()), HttpStatus.OK);
         }
     }
@@ -78,7 +81,7 @@ public class GeneController {
     @ApiOperation("Get a gene")
     public ResponseEntity<Gene> getGene(
         @ApiParam(required = true, value = "Entrez Gene ID or Hugo Gene Symbol e.g. 1 or A1BG")
-        @PathVariable String geneId) throws GeneNotFoundException {
+        @PathVariable String geneId) throws GeneNotFoundException, GeneWithMultipleEntrezIdsException {
 
         return new ResponseEntity<>(geneService.getGene(geneId), HttpStatus.OK);
     }
@@ -88,7 +91,7 @@ public class GeneController {
     @ApiOperation("Get aliases of a gene")
     public ResponseEntity<List<String>> getAliasesOfGene(
         @ApiParam(required = true, value = "Entrez Gene ID or Hugo Gene Symbol e.g. 1 or A1BG")
-        @PathVariable String geneId) throws GeneNotFoundException {
+        @PathVariable String geneId) throws GeneNotFoundException, GeneWithMultipleEntrezIdsException {
 
         return new ResponseEntity<>(geneService.getAliasesOfGene(geneId), HttpStatus.OK);
     }
@@ -111,7 +114,7 @@ public class GeneController {
                 .getTotalCount().toString());
             return new ResponseEntity<>(responseHeaders, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(geneService.fetchGenes(geneIds, geneIdType.name(), projection.name()), 
+            return new ResponseEntity<>(geneService.fetchGenes(geneIds, geneIdType.name(), projection.name()),
                 HttpStatus.OK);
         }
     }

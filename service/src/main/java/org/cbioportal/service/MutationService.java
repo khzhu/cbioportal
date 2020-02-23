@@ -1,35 +1,73 @@
 package org.cbioportal.service;
 
 import org.cbioportal.model.Mutation;
-import org.cbioportal.model.MutationCount;
-import org.cbioportal.model.MutationSampleCountByGene;
-import org.cbioportal.model.MutationSampleCountByKeyword;
-import org.cbioportal.model.meta.BaseMeta;
+import org.cbioportal.model.MutationCountByPosition;
+import org.cbioportal.model.MutationCountByGene;
 import org.cbioportal.model.meta.MutationMeta;
-import org.cbioportal.service.exception.GeneticProfileNotFoundException;
+import org.cbioportal.service.exception.MolecularProfileNotFoundException;
 
 import java.util.List;
 
 public interface MutationService {
     
-    List<Mutation> getMutationsInGeneticProfileBySampleListId(String geneticProfileId, String sampleListId, 
-                                                              String projection, Integer pageSize, Integer pageNumber,
-                                                              String sortBy, String direction) throws GeneticProfileNotFoundException;
+    List<Mutation> getMutationsInMolecularProfileBySampleListId(String molecularProfileId, String sampleListId,
+                                                                List<Integer> entrezGeneIds, Boolean snpOnly,
+                                                                String projection, Integer pageSize, Integer pageNumber,
+                                                                String sortBy, String direction) 
+        throws MolecularProfileNotFoundException;
 
+    MutationMeta getMetaMutationsInMolecularProfileBySampleListId(String molecularProfileId, String sampleListId,
+                                                                  List<Integer> entrezGeneIds) 
+        throws MolecularProfileNotFoundException;
 
-    MutationMeta getMetaMutationsInGeneticProfileBySampleListId(String geneticProfileId, String sampleListId) throws GeneticProfileNotFoundException;
+    List<Mutation> getMutationsInMultipleMolecularProfiles(List<String> molecularProfileIds, List<String> sampleIds,
+                                                           List<Integer> entrezGeneIds, String projection,
+                                                           Integer pageSize, Integer pageNumber,
+                                                           String sortBy, String direction);
 
-    List<Mutation> fetchMutationsInGeneticProfile(String geneticProfileId, List<String> sampleIds, String projection,
-                                                  Integer pageSize, Integer pageNumber, String sortBy,
-                                                  String direction) throws GeneticProfileNotFoundException;
+    MutationMeta getMetaMutationsInMultipleMolecularProfiles(List<String> molecularProfileIds, List<String> sampleIds,
+                                                             List<Integer> entrezGeneIds);
 
-    MutationMeta fetchMetaMutationsInGeneticProfile(String geneticProfileId, List<String> sampleIds) throws GeneticProfileNotFoundException;
+    List<Mutation> fetchMutationsInMolecularProfile(String molecularProfileId, List<String> sampleIds,
+                                                    List<Integer> entrezGeneIds, Boolean snpOnly, String projection,
+                                                    Integer pageSize, Integer pageNumber, String sortBy, 
+                                                    String direction) 
+        throws MolecularProfileNotFoundException;
 
-    List<MutationSampleCountByGene> getSampleCountByEntrezGeneIds(String geneticProfileId, List<Integer> entrezGeneIds) throws GeneticProfileNotFoundException;
+    MutationMeta fetchMetaMutationsInMolecularProfile(String molecularProfileId, List<String> sampleIds,
+                                                      List<Integer> entrezGeneIds) 
+        throws MolecularProfileNotFoundException;
 
-    List<MutationSampleCountByKeyword> getSampleCountByKeywords(String geneticProfileId, List<String> keywords) throws GeneticProfileNotFoundException;
+    List<MutationCountByGene> getSampleCountByEntrezGeneIdsAndSampleIds(String molecularProfileId,
+                                                                        List<String> sampleIds,
+                                                                        List<Integer> entrezGeneIds)
+        throws MolecularProfileNotFoundException;
+    
+    List<MutationCountByGene> getSampleCountInMultipleMolecularProfiles(List<String> molecularProfileIds,
+                                                                        List<String> sampleIds,
+                                                                        List<Integer> entrezGeneIds,
+                                                                        boolean includeFrequency,
+                                                                        boolean includeMissingAlterationsFromGenePanel);
 
-    List<MutationCount> getMutationCountsInGeneticProfileBySampleListId(String geneticProfileId, String sampleListId) throws GeneticProfileNotFoundException;
+    List<MutationCountByGene> getSampleCountInMultipleMolecularProfilesForFusions(List<String> molecularProfileIds,
+                                                                                  List<String> sampleIds,
+                                                                                  List<Integer> entrezGeneId,
+                                                                                  boolean includeFrequency,
+                                                                                  boolean includeMissingAlterationsFromGenePanel);
+    
+    List<MutationCountByGene> getPatientCountInMultipleMolecularProfiles(List<String> molecularProfileIds,
+                                                                        List<String> patientIds,
+                                                                        List<Integer> entrezGeneIds,
+                                                                        boolean includeFrequency,
+                                                                        boolean includeMissingAlterationsFromGenePanel);
 
-    List<MutationCount> fetchMutationCountsInGeneticProfile(String geneticProfileId, List<String> sampleIds) throws GeneticProfileNotFoundException;
+    List<MutationCountByPosition> fetchMutationCountsByPosition(List<Integer> entrezGeneIds, 
+                                                                List<Integer> proteinPosStarts, 
+                                                                List<Integer> proteinPosEnds);
+
+    // TODO: cleanup once fusion/structural data is fixed in database
+    List<Mutation> getFusionsInMultipleMolecularProfiles(List<String> molecularProfileIds, List<String> sampleIds,
+            List<Integer> entrezGeneIds, String projection, Integer pageSize, Integer pageNumber, String sortBy,
+            String direction);
+    // TODO: cleanup once fusion/structural data is fixed in database
 }

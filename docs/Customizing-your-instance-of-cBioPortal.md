@@ -2,7 +2,14 @@
 
 cBioPortal contains a number of properties that allow you to customize your cBioPortal instance. 
 
-This page focuses on the skin properties, which allow you to customize the web page cosmetics, such as custom images, texts, which tabs are visible, etc. Nearly all the skins properties have defaults, which can be overwritten by changing the `portal.properties` file, located in `{PORTAL_HOME}/src/main/resources/portal.properties`. If your cBioPortal instance does not yet contain a `portal.properties` file, you can copy the `portal.properties.EXAMPLE` and edit it. 
+This page focuses on the skin properties, which allow you to
+customize the web page cosmetics, such as custom images,
+texts, which tabs are visible, etc.
+Nearly all the skins properties have defaults, which can be overwritten by
+changing the `portal.properties` file located in `$PORTAL_HOME`--see
+[the deployment manual](Deploying.md). If your cBioPortal instance
+does not yet contain a `portal.properties` file, you can copy
+`src/main/resources/portal.properties.EXAMPLE` and edit it.
 
 Below you can find the complete list of all the available skin properties.
 
@@ -91,10 +98,10 @@ Below you can find the complete list of all the available skin properties.
 			<td>Specify as name at somewhere dot extension or as name@somewhere.extension</td>
 		</tr>
       <tr>
-         <td>skin.examples_right_column</td>
-         <td>set the Examples Queries section in the right navigation bar. The html page should be placed in the content directory or in a subdirectory of the content directory. If placed in a subdirectory, the skin.examples_right_column value has to contain the folder, e.g. skin.examples_right_column = myFolder/myExamples.html</td>
-         <td>examples.html</td>
-         <td>text</td>
+         <td>skin.examples_right_column_html</td>
+         <td>set the Examples Queries section in the right navigation bar</td>
+         <td>&lt;ul&gt;&lt;li&gt;&lt;a href="patient?studyId=ucec_tcga_pub&caseId=TCGA-BK-A0CC"&gt;Patient view of an endometrial cancer case&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</td>
+         <td>Any HTML text</td>
       </tr>
 		<tr>
 			<td>skin.footer</td>
@@ -113,12 +120,6 @@ Below you can find the complete list of all the available skin properties.
 			<td>sets the button text for saml login</td>
 			<td>Sign in with MSK</td>
 			<td>Any HTML text</td>
-		</tr>
-		<tr>
-			<td>skin.patient_view.show_drugs_tab</td>
-			<td>show the "Drugs" tab in the patient view</td>
-			<td>true</td>
-			<td>true / false</td>
 		</tr>
 		<tr>
 			<td>skin.right_logo</td>
@@ -193,12 +194,6 @@ Below you can find the complete list of all the available skin properties.
 			<td>true / false</td>
 		</tr>
 		<tr>
-			<td>skin.show_visualize_your_data_tab</td>
-			<td>show the "VISUALIZE YOUR DATA" tab in the header</td>
-			<td>true</td>
-			<td>true / false</td>
-		</tr>
-		<tr>
 			<td>skin.show_web_api_tab</td>
 			<td>show the "WEB API" tab in the header</td>
 			<td>true</td>
@@ -216,14 +211,29 @@ Below you can find the complete list of all the available skin properties.
 			<td>cBioPortal for Cancer Genomics</td>
 			<td>text</td>
 		</tr>
+		<tr>
+            <td>skin.query.max_tree_depth</td>
+            <td>sets the maximum number of subcategories shown in the query component hierarchy before each study. E.g. when set to 0, the hierarchy is flat, meaning only the study elements show in the component, without any tissue or cancer type sorting.</td>
+            <td>3</td>
+            <td>integer</td>
+        </tr>
+		<tr>
+            <td>skin.patientview.filter_genes_profiled_all_samples</td>
+            <td>sets default setting for the genes filter in patient view to only show mutations for genes that were profiled for mutations or CNA's in all samples of that patient. If unset, patient view will show mutations/CNA's for genes that were profiled in any sample.</td>
+            <td>false</td>
+            <td>true / false</td>
+        </tr>
    </tbody>
 </table>
 
-# Creating your own local news/about/FAQ/or Examples page
+# Customization when using Docker
+To add images or other files to the Docker image one can mount them inside the `cbioportal-webapp` folder. For example to use a custom logo for `skin.right_logo`. Mount the image inside the`cbioportal-webapp` folder with `-v /path/to/custom_logo.png:/cbioportal-webapp/images/custom_logo.png` and set `skin.right_logo=custom_logo.png` in your properties file.
 
-Creating you own local news/about/FAQ or Examples page involves three steps. For example, to create your own news page:
+# Creating your own local news/about or FAQ page
 
-1. Copy `{PORTAL_HOME}/portal/src/main/webapp/content/news.html` to `news_XXXX.html`
+Creating you own local news/about or FAQ page involves three steps. For example, to create your own news page:
+
+1. Copy `<cbioportal_source_folder>/portal/src/main/webapp/content/news.html` to `news_XXXX.html`
 2. Modify `news_XXXX.html` as needed.
 3. Edit the `portal.properties` file and change the `skin.documentation.news` property, giving it the name of your news HTML component.
 
@@ -244,7 +254,7 @@ skin.documentation.news=News.md
 cBioPortal can use pages stored in (a subdirectory of) your content directory as news/faq/about page. For example, if your news page is called myNews.md and stored in content/myFolder, use 
 
 ```
-skin.documentation.baseurl=
+skin.documentation.baseurl=/
 skin.documentation.news=myFolder/myNews.md
 ```
 
@@ -259,6 +269,6 @@ If your documentation contains a relative link, cBioPortal will assume it uses t
 Please be aware that the links may be case-sensitive! E.g. https://github.com/cBioPortal/cbioportal/wiki/News.md is not the same as https://github.com/cBioPortal/cbioportal/wiki/news.md
 
 # Custom styling of the patient view's clinical data
-The [Patient View](http://www.cbioportal.org/case.do?cancer_study_id=lgg_ucsf_2014&case_id=P04) shows several [clinical attributes](File-Formats.md#clinical-data) at the top of the page, e.g. `AGE`, `SEX`:
+The [Patient View](https://www.cbioportal.org/patient?studyId=lgg_ucsf_2014&caseId=P04) shows several [clinical attributes](File-Formats.md#clinical-data) at the top of the page, e.g. `AGE`, `SEX`:
 ![test](../test/end-to-end/screenshots/firefox/patient_view_lgg_ucsf_2014_case_id_P04.png)
 The order, styling and visibility of those [attributes](File-Formats.md#clinical-data) at the top can be changed by editing the [patient view's clinical attributes CSS file](../portal/src/main/webapp/css/patient-view/clinical-attributes.css).
