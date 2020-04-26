@@ -38,7 +38,7 @@ skin.documentation.oql=Onco-Query-Language.md
 skin.documentation.dat=Authenticating-Users-via-Tokens.md
 
 # setting controlling the logos
-skin.right_logo=
+skin.right_logo=logo-nyu-langone.png
 skin.tag_line_image=tag_line.png
 
 # setting controlling which tabs to hide.
@@ -167,7 +167,7 @@ segfile.url=http://cbio.mskcc.org/cancergenomics/gdac-portal/seg/
 # https://docs.cbioportal.org/2.4-integration-with-other-webservices/oncokb-data-access.
 
 # Enable OncoKB annotation (true, false)
-show.oncokb=true
+show.oncokb=false
 
 # The URL of the OncoKB instance to connect to.
 # The default address does not require authentication and is freely to use.

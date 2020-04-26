@@ -216,7 +216,7 @@ function openSoicalAuthWindow() {
 	        
 
         <c:if test="${rightLogo != ''}">
-            <img id="institute-logo" src="<c:url value="${rightLogo}"/>" alt="Institute Logo" />
+            <img id="institute-logo" src="<c:url value="/${rightLogo}"/>" alt="Institute Logo" />
         </c:if>
         </div>
 
