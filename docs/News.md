@@ -1,4 +1,40 @@
-## Oct 16, 2020
+## Jan 12, 2021
+*   **New Feature**: Add your own custom data for a sample or patient to use on the study or comparison view  [Example: Add custom data to three samples and do a comparison](https://www.cbioportal.org/study/summary?id=msk_impact_2017)
+
+    <img src="https://user-images.githubusercontent.com/1334004/104651553-ce7efd00-5685-11eb-8017-c43f24421e3f.png" width="700">
+    
+*   **New Feature**: Show the mutations of a patient inside a pathway schematic using PathwayMapper  [Example: Notch signaling pathway in a prostate cancer patient](https://www.cbioportal.org/patient/pathways?studyId=msk_impact_2017&caseId=P-0000377)
+
+    <img src="https://user-images.githubusercontent.com/1334004/104649378-9f1ac100-5682-11eb-91eb-4e0f024a4ded.png" width="700">
+
+*   **New Feature**: Display and compare generic assays, such as microbiome and treatment response, on the study view [Example: Prasinovirus microbiome signatures in TCGA](https://www.cbioportal.org/study?id=6000b6aae4b015b63e9d4d44)
+    <img src="https://user-images.githubusercontent.com/1334004/104651211-54e70f00-5685-11eb-94f1-f20930793c28.png" width="700">
+
+*   **New Feature**: The Plots tab on _Results View_ now allows you to group alterations by Driver and VUS [Example: POLE driver mutations vs VUSs against mutation counts in TCGA Colorectal Adenocarcinoma](https://bit.ly/3ssY9Gu)
+    <img src="https://user-images.githubusercontent.com/1334004/104768867-56bfd980-573c-11eb-8e03-5ad86d01f25a.png" width="700">
+
+
+## Dec 31, 2020
+*   **Added data** consisting of 430 samples from 5 studies:
+     * [Juvenile Papillomatosis and Breast Cancer (MSK, 2020)](https://www.cbioportal.org/study/summary?id=brca_jup_msk_2020) *5 samples* 
+     * [Mixed cfDNA (MSKCC, 2020)](https://www.cbioportal.org/study/summary?id=mixed_cfdna_msk_2020) *229 samples* 
+     * [Metastatic Melanoma (DFCI, Nature Medicine 2019)](https://www.cbioportal.org/study/summary?id=mel_dfci_2019) *144 samples* 
+     * [Lung Cancer (SMC, Cancer Research 2016)](https://www.cbioportal.org/study/summary?id=lung_smc_2016) *22 samples* 
+     * [Upper Tract Urothelial Carcinoma (IGBMC, Genome Biology 2021)](https://www.cbioportal.org/study/summary?id=utuc_igbmc_2021) *30 samples* 
+*    **Added survival data** to [Breast Cancer (METABRIC, Nature 2012 & Nat Commun 2016)](https://www.cbioportal.org/study/summary?id=brca_metabric)
+
+## November 3, 2020
+*   **New Feature**: The [map](https://www.cbioportal.org/installations) of local installations of cBioPortal is available now. Please consider registering your instance [here](http://bit.ly/2XW3wNG ).
+![image](https://user-images.githubusercontent.com/840895/99544685-96f41d00-2982-11eb-9de2-457a4456c294.png)
+
+*   **Enhancement**: upgraded the _Genomic Evolution_ tab in _Patient View_ with timeline [Example](https://www.cbioportal.org/patient/genomicEvolution?caseId=P04&studyId=lgg_ucsf_2014)
+![image](https://user-images.githubusercontent.com/840895/99543852-a3c44100-2981-11eb-8f53-14a0b51b767c.png)
+
+## October 20, 2020
+*   **Enhancement**: _Expression_ tab has now been merged into the _Plots_ tab
+![image](https://user-images.githubusercontent.com/840895/99565969-4ee0f480-299a-11eb-8371-8cfd09c6e4ba.png)
+
+## October 16, 2020
 *   **Added data** consisting of 25,078 samples from 5 studies:
      * [Melanomas (TCGA, Cell 2015)](https://cbioportal.org/study/summary?id=skcm_tcga_pub_2015) *359 samples* 
      * [Retinoblastoma cfDNA (MSKCC 2020)](https://www.cbioportal.org/study/summary?id=rbl_cfdna_msk_2020) *14 samples* 
@@ -14,6 +50,16 @@ The normals samples RNA-Seq V2 expression data were curated from [GDC](https://g
 
 ![image](https://user-images.githubusercontent.com/840895/96191246-b32f1500-0f11-11eb-8727-bcfdd2d724a3.png)
 
+## October 13, 2020
+*   **Enhancement**: _Study View_ now allows comparing samples with mutations or copy number alterations in different genes
+![image](https://user-images.githubusercontent.com/840895/99558433-ba729400-2991-11eb-9054-1d8751b4d84f.png)
+
+*   **New Feature**: When treatment timeline is available (e.g. in [this study](https://www.cbioportal.org/study/summary?id=lgg_ucsf_2014)), _Study View_ now allows the selection and comparison of patients treated with specific drugs, or samples sequenced pre or post specific drug treatments
+![image](https://user-images.githubusercontent.com/840895/99556958-248a3980-2990-11eb-97e3-d833518f8aef.png)
+
+## September 30, 2020
+*   **New Feature**: Microbiome signature data is available for comparison now. [Example: comparing colorectal subtypes for enriched microbiome signatures](https://www.cbioportal.org/comparison/generic_assay_microbiome_signature?sessionId=5dea8bbde4b05f1dfb8ace51)
+![image](https://user-images.githubusercontent.com/840895/99566847-666cad00-299b-11eb-91d3-21b21f267733.png)
 
 ## September 22, 2020
 
